@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>List</h1>
+<table>
+  <tr class="yellow"><th>User</th><th>Login</th><th>Logout</th></tr>
+  {% for session in sessions %}      
+    <tr><td>{{ session.user }}</td><td>{{ session.login }}</td><td>{{ session.logout }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}
