@@ -4,9 +4,22 @@
 <h1>Lista</h1>
 
 <table width="690" border="0" align="left" cellpadding="0" cellspacing="0" class="offers">
-  <tr class="yellow"><th width="230">User</th><th width="230">Login</th><th width="230">Logout</th></tr>
+  <tr class="yellow"><th width="173">User</th><th width="173">Login</th><th width="173">Logout</th><th widht="173">Duration</th></tr>
   {% for session in sessions %}
-    <tr><td>{{ session.user }}</td><td>{{ session.login|date:"Y.m.d. H:i" }}</td><td>{{ session.logout|date:"Y.m.d. H:i" }}</td></tr>
+    <tr><td>{{ session.user }}</td><td>{{ session.login|date:"Y.m.d. H:i" }}</td><td>{{ session.logout|date:"Y.m.d. H:i" }}</td><td>{{ session.duration }}</td></tr>
   {% endfor %}
 </table>
+<ul class="pager">
+    {% if prev %}
+    <li><a href="/list" class="first" /></li>
+    <li><a href="/list/{{ prev }}" class="prev">Prev</a></li>
+    {% endif %}
+    {% for p in count %}
+    <li><a href="/list/{{ p }}" {% ifequal p from %}class="on"{% endifequal %}>{{ p }}</a></li>
+    {% endfor %}
+    {% if next %}
+    <li><a href="/list/{{ next }}" class="next">Next</a></li>
+    <li><a href="/list/{{ count|last }}" class="last" /></li>
+    {% endif %}
+</ul>
 {% endblock %}

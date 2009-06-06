@@ -1,0 +1,98 @@
+8
+
+dir
+86
+http://google-app-engine-django.googlecode.com/svn/trunk/appengine_django
+http://google-app-engine-django.googlecode.com/svn
+
+
+
+2009-05-15T14:13:11.475056Z
+85
+mattbrown.nz
+has-props
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+d4307497-c249-0410-99bd-594fbd7e173e
+
+auth
+dir
+
+tests
+dir
+
+db
+dir
+
+conf
+dir
+
+sessions
+dir
+
+__init__.py
+file
+
+
+
+
+2009-06-06T15:44:26.000000Z
+127533e82d989d5ff72712ea131dca52
+2009-04-17T17:50:46.157442Z
+80
+mattbrown.nz
+
+serializer
+dir
+
+mail.py
+file
+
+
+
+
+2009-06-06T15:44:26.000000Z
+bdb56f0b6dc61f5114241391d4ff61bb
+2009-05-15T12:20:30.784185Z
+83
+mattbrown.nz
+
+models.py
+file
+
+
+
+
+2009-06-06T15:44:26.000000Z
+961d04fbb14bb5c570dc6d7fc788087f
+2009-05-15T14:13:11.475056Z
+85
+mattbrown.nz
+has-props
+
+replacement_imp.py
+file
+
+
+
+
+2009-06-06T15:44:26.000000Z
+b85ad0410e028e95360d77cff67b5720
+2008-04-10T19:27:52.403124Z
+2
+mattbrown.nz
+
+management
+dir
+

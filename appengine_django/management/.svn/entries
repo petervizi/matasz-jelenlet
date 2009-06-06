@@ -1,0 +1,44 @@
+8
+
+dir
+86
+http://google-app-engine-django.googlecode.com/svn/trunk/appengine_django/management
+http://google-app-engine-django.googlecode.com/svn
+
+
+
+2009-03-11T17:18:13.751547Z
+76
+andyster
+has-props
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+d4307497-c249-0410-99bd-594fbd7e173e
+
+commands
+dir
+
+__init__.py
+file
+
+
+
+
+2009-06-06T15:44:26.000000Z
+d41d8cd98f00b204e9800998ecf8427e
+2008-04-10T19:27:52.403124Z
+2
+mattbrown.nz
+has-props
+
