@@ -84,7 +84,7 @@ class LogoutPage(webapp.RequestHandler):
         session_q = Session.all()
         session_q.filter('user = ', self.request.get('user'))
         session_q.order('-login')
-        sessions = session_q.fetch(1)
+        sessions = session_q.get()
         
         if len(sessions) == 1:
             session = sessions[0]
