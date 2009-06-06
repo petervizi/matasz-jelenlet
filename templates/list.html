@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>List</h1>
-<table>
-  <tr class="yellow"><th>User</th><th>Login</th><th>Logout</th></tr>
-  {% for session in sessions %}      
-    <tr><td>{{ session.user }}</td><td>{{ session.login }}</td><td>{{ session.logout }}</td></tr>
+<h1>Lista</h1>
+
+<table width="690" border="0" align="left" cellpadding="0" cellspacing="0" class="offers">
+  <tr class="yellow"><th width="230">User</th><th width="230">Login</th><th width="230">Logout</th></tr>
+  {% for session in sessions %}
+    <tr><td>{{ session.user }}</td><td>{{ session.login|date:"Y.m.d. H:i" }}</td><td>{{ session.logout|date:"Y.m.d. H:i" }}</td></tr>
   {% endfor %}
 </table>
 {% endblock %}
