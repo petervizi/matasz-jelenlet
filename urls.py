@@ -18,7 +18,9 @@ urlpatterns = patterns('',
                        (r'^$', 'jelenlet.views.index'),
                        (r'^list/(?P<list_from>\d*)$', 'jelenlet.views.list'),
                        (r'^login$', 'jelenlet.views.login'),
-                       (r'^logout$', 'jelenlet.views.logout')
+                       (r'^logout$', 'jelenlet.views.logout'),
+                       (r'^user/(?P<name>.+)/(?P<page>\d*)', 'jelenlet.views.user'),
+                       (r'^week/(?P<page>)\d*', 'jelenlet.views.week'),
     # Example:
     # (r'^foo/', include('foo.urls')),
 

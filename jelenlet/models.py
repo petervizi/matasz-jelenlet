@@ -9,3 +9,7 @@ class Session(BaseModel):
 class UserNumber(BaseModel):
     time = db.DateTimeProperty(auto_now_add=True)
     number = db.IntegerProperty()
+
+class WeeklyStat(BaseModel):
+    week = db.IntegerProperty()
+    url = db.StringProperty()

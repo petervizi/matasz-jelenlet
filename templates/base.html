@@ -47,10 +47,10 @@
 	      <div class="flagholder">
 		<a href="http://www.erepublik.com/en/country/Hungary"><img title="Hungary" alt="Hungary" src="http://www.erepublik.com/images/flags/L/Hungary.gif" /></a></div>
 	      
-	      <div id="wellnessmeter" class="">
-		<div class="meter sm" style="height: {{ online_percent }}%;"></div>
+	      <div id="wellnessmeter" class="" title="Peakhez kepest hanyan vannak">
+		<div class="meter sm"  style="height: {{ online_percent }}%;"></div>
 		</div>
-	      <div id="wellnessvalue">{{ online_users }}</div>
+	      <div id="wellnessvalue" title="Online felhasznalok">{{ online_users }}</div>
 	      <div id="accountdisplay">
 
 		<div class="item">
@@ -59,8 +59,8 @@
 		    0</div>        
 		</div>
 		<div class="item">
-		  <img class="flag" alt="HUF" title="HUF" src="http://www.erepublik.com/images/flags/S/Hungary.gif" />
-		  0        </div>
+		  <img class="flag" alt="Online peak" title="Online peak" src="http://www.erepublik.com/images/flags/S/Hungary.gif" />
+		  {{ online_peak }}        </div>
 		</div>
 	      <div id="maildisplay">
 
@@ -79,6 +79,7 @@
 </div>
 	</div> <!-- sidebar -->
 	<div id="content">
+	  <h1>{{ title }}</h1>
       {% block content %}
 
       {% endblock %}

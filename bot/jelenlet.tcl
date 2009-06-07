@@ -34,4 +34,3 @@ proc part:report_logout { nick host hand chan msg } {
     http::geturl $logout_url -query $query
     return 0
 }
-
