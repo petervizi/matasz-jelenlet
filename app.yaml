@@ -5,12 +5,10 @@ api_version: 1
 
 handlers:
 - url: /stylesheets
-  static_dir: stylesheets
-- url: /scripts
-  static_dir: scripts
+  static_dir: static/stylesheets
 - url: /images
-  static_dir: images
+  static_dir: static/images
 - url: /flash
-  static_dir: flash
+  static_dir: static/flash
 - url: /.*
   script: main.py
