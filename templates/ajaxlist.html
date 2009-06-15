@@ -1,9 +1,7 @@
-{% extends "base.html" %}
-
 {% load i18n %}
 
-{% block content %}
 <table width="690" border="0" align="left" cellpadding="0" cellspacing="0" class="offers">
+    <caption>{% trans "Sessions" %}</caption>
   <tr class="yellow"><th width="173">{% trans "User" %}</th><th width="173">{% trans "Login" %}</th><th width="173">{% trans "Logout" %}</th><th width="173">{% trans "Duration" %}</th></tr>
   {% for session in sessions %}
     <tr><td><a href="/user/{{ session.user }}">{{ session.user }}</a></td><td>{{ session.login|date:"Y.m.d. H:i" }}</td><td>{{ session.logout|date:"Y.m.d. H:i" }}</td><td>{{ session.duration }}</td></tr>
@@ -11,15 +9,14 @@
 </table>
 <ul class="pager">
     {% if prev %}
-    <li><a href="/list" class="first" /></li>
-    <li><a href="/list/{{ prev }}" class="prev">{% trans "Prev" %}</a></li>
+    <li><a href="#" onClick="dload_sessions('{{ title }}', 1)" class="first" /></li>
+    <li><a href="#" onClick="dload_sessions('{{ title }}', {{ prev}})" class="prev">{% trans "Prev" %}</a></li>
     {% endif %}
     {% for p in range %}
-    <li><a href="/list/{{ p }}" {% ifequal p from %}class="on"{% endifequal %}>{{ p }}</a></li>
+    <li><a href="#" onClick="dload_sessions('{{ title }}', {{ p }})" {% ifequal p from %}class="on"{% endifequal %}>{{ p }}</a></li>
     {% endfor %}
     {% if next %}
-    <li><a href="/list/{{ next }}" class="next">{% trans "Next" %}</a></li>
-    <li><a href="/list/{{ count }}" class="last" /></li>
+    <li><a href="#" onClick="dload_sessions('{{ title }}', {{ next }})" class="next">{% trans "Next" %}</a></li>
+    <li><a href="#" onClick="dload_sessions('{{ title }}', {{ last }})" class="last" /></li>
     {% endif %}
 </ul>
-{% endblock %}

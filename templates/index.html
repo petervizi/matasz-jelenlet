@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 
-{% block header %}
-<div class="title"><h1>Üdvözlet</h1></div>
-{% endblock %}
+{% load i18n %}
+
 {% block content %}
 <p>
-<img src="/week" alt="week view" />
+<img src="/week/{{ today }}" alt="{% trans "Week view" %}" />
 </p>
 {% endblock %}

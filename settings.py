@@ -16,7 +16,7 @@
 
 import os
 
-DEBUG = True
+DEBUG = True 
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -41,7 +41,7 @@ TIME_ZONE = 'UTC'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'hu-HU'
 
 SITE_ID = 1
 
@@ -64,7 +64,7 @@ MEDIA_URL = ''
 ADMIN_MEDIA_PREFIX = '/media/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'hvhxfm5u=^*v&doo#oq8x*eg8+1&9sxbye@=umutgn^t_sg_nx'
+SECRET_KEY = 'asdfh309450v@#N$%0asd%N^asd*))mad12-_:><bmas0!^^va'
 
 # Ensure that email is not sent via SMTP by default to match the standard App
 # Engine SDK behaviour. If you want to sent email via SMTP then add the name of

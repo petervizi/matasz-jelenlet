@@ -1,54 +1,87 @@
 import sys
 sys.path.insert(0, 'GChartWrapper.zip')
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import *
 from django.core.urlresolvers import reverse
 from django.template import Context, loader
-from jelenlet.models import Session, UserNumber
+from django.utils.translation import ugettext as _
+from django.utils import simplejson
+from django.core import serializers
+
+from jelenlet.models import *
 
 from google.appengine.ext import db
 from google.appengine.api import memcache
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from GChartWrapper import *
 import math
 
 from tz import utc, cest
+import logging
 
-q = db.GqlQuery("SELECT * FROM UserNumber ORDER BY number DESC")
-m = q.get()
-if m:
-    memcache.set("online_peak", m.number)
-else:
-    memcache.set("online_peak", 1)
+def get_online_users():
+    data = memcache.get('online_users')
+    if data is None:
+        data = UserNumber.all().order('-time').get()
+        if data is None:
+            logging.debug('nincs data')
+            data = 0
+        elif data.number < 0:
+            data = 0
+        else:
+            data = data.number
+        memcache.set('online_users', data, 120)
+    logging.info('kiadjuk %d', data)
+    return data
 
-q = db.GqlQuery("SELECT * FROM Session WHERE logout < 0")
-m = q.count()
-memcache.set("online_users", m)
+def get_online_peak():
+    data = memcache.get('online_peak')
+    if data is None:
+        data = UserNumber.all().order('-number').get()
+        if data is None:
+            data = 1
+        else:
+            try:
+                data = int(data.number)
+            except:
+                data = 1
+        if data <= 0:
+            data = 1
+        memcache.set('online_peak', data, 120)
+    return data
+
 
 def index(request):
     t = loader.get_template("index.html")
+    today = datetime.now()
     c = Context({
-            'online_percent': 100.-100*float(memcache.get("online_users"))/memcache.get("online_peak"),
-            'online_users': memcache.get("online_users"),
-            'online_peak': memcache.get("online_peak")
+            'title': _("Welcome"),
+            'today': '%d-%02d-%02d' % (today.year, today.month, today.day),
             })
     return HttpResponse(t.render(c))
 
 def list(request, list_from=0):
-    if not list_from:
-        list_from = 1
+    if request.method == 'GET':
+        if not list_from:
+            list_from = 1
+        else:
+            list_from = int(list_from)
+        sessions = Session.all()
+        sessions.order('-login')
+        t = loader.get_template("list.html")
+        title = _('List')
     else:
-        list_from = int(list_from)
-    sessions = Session.all()
-    sessions.order('-login')
-    
-    t = loader.get_template("list.html")
-    count = math.ceil(Session.all().count() / 10.)+1
+        name = request.POST['name']
+        list_from = int(request.POST['page'])
+        sessions = Session.all().filter('user = ', name).order('-login')
+        t = loader.get_template('ajaxlist.html')
+        title = name
+
+    count = math.ceil(sessions.count() / 10.)+1    
     next = 0
     if list_from + 1 < count:
         next = list_from + 1
-
     thesessions = sessions.fetch(10, (list_from - 1)*10)
     for session in thesessions:
         session.login = session.login.replace(tzinfo=utc).astimezone(cest)
@@ -59,86 +92,154 @@ def list(request, list_from=0):
     prange = xrange(list_from - 3, list_from + 3)
     prange = [p for p in prange if p > 0 and p < count]
     c = Context({
-            'online_percent': 100.-100*float(memcache.get("online_users"))/memcache.get("online_peak"),
-            'online_users': memcache.get("online_users"),
             'from': list_from,
             'next': next,
             'prev': list_from - 1,
             'count': int(count) - 1,
             'range': prange,
             'sessions': thesessions,
-            'title': 'Lista',
+            'title': title,
             })
     return HttpResponse(t.render(c))
 
 def login(request):
     if request.method == 'POST':
+        logging.debug('login')
+        #dsession = db.GqlQuery("SELECT * FROM Session WHERE user = :1 AND logout < :2",
+        #                       request.POST['user'], 0)
+        #dsession = dsession.get()        
+        #if dsession:
+        #    logging.info("dangling")
+        #    dsession.logout = datetime.now()            
+        #    dsession.put()
         session = Session()
         session.user = request.POST['user']
         session.put()
-        memcache.incr("online_users")
-        n = memcache.get("online_users")
+        n = UserNumber.all().order('-time').get()
+        if (n is None) or (n.number is None):
+            n = 0
+        elif n.number:
+            n = n.number
         userno = UserNumber()
-        userno.number = n
-        if n > memcache.get("online_peak"):
-            memcache.set("online_peak", n)
+        try:
+            userno.number = int(n + 1)
+        except:
+            loggin.debug('Number was not a number!')
+            userno.number = 0
         userno.put()
-    return HttpResponseRedirect(reverse('jelenlet.views.index'))
+        duser = CUser.all().filter('name = ', request.POST['user'])
+        duser = duser.get()
+        if not duser:
+            logging.debug('Creating new user.')
+            duser = CUser()
+            duser.name = request.POST['user']
+            duser.online_time = 0
+        duser.lastlogin = datetime.now()
+        duser.online = True
+        duser.put()
+        return HttpResponseRedirect(reverse('jelenlet.views.index'))
+    else:
+        raise Http404
 
 def logout(request):
     if request.method == 'POST':
+        logging.debug('logout')
         session_q = Session.all()
         session_q.filter('user = ', request.POST['user'])
         session_q.order('-login')
         session = session_q.get()
+        userno = UserNumber()
+        n = UserNumber.all().order('-time').get()
+        if n is None:
+            n = 0
+        else:
+            n = n.number
         if session:
             session.logout = datetime.now()
-            memcache.decr("online_users")
+            logging.debug('there was a session, closing')
         else:
+            loggin.debug('creating new session')
             session = Session()
             session.user = request.POST['user']
             session.logout = session.login
         session.put()
-    return HttpResponseRedirect(reverse('jelenlet.views.index'))
-
-def user(request, name, page):
-    if not page:
-        page = 0
+        duser = CUser.all().filter('name = ', request.POST['user']).get()
+        if not duser:
+            logging.debug('creating new user')
+            duser = CUser()
+            duser.name = request.POST['user']
+            duser.lastlogin = datetime.now()
+            duser.online_time = 0
+            duser.online = True
+        if duser.online:
+            logging.debug('user was online')
+            try:
+                userno.number = n - 1
+                if userno.number < 0:
+                    userno.number = 0
+            except:
+                logging.debug('could not decrease number')
+                userno.number = 0
+        duser.online = False
+        userno.put()            
+        delta = duser.lastlogin - datetime.now()
+        duser.online_time = duser.online_time + delta.seconds
+        duser.put()
+        return HttpResponseRedirect(reverse('jelenlet.views.index'))
     else:
-        page = int(page)
-    sessions_q = Session.all().filter('user = ', name).order('-login')
+        raise Http404
 
-    sessions = sessions_q.fetch(10, page * 10)
+def nickchange(request):
+    if request.method == 'POST':
+        oldn = request.POST['old']
+        newn = request.POST['new']
+        ouser = CUser.all().filter('name = ', oldn)
+        ouser = ouser.get()
+        if not ouser:
+            ouser = CUser()
+            ouser.name = newn
+            ouser.lastlogin = datetime.now()
+            ouser.online_time = 0
+        else:
+            ouser.name = newn
+        ouser.online = True
+        ouser.put()
+        session = Session.all().filter('user = ', oldn)
+        session = session.get()
+        if session:
+            session.user = newn
+        else:
+            session = Session()
+            session.user = newn
+        session.put()
+        return HttpResponseRedirect(reverse('jelenlet.views.index'))
+    else:
+        raise Http404
 
-    sessions = sessions_q.fetch(10, page * 10)
-    for session in sessions:
-        session.login = session.login.replace(tzinfo=utc).astimezone(cest)
-        if session.logout:
-            session.logout = session.logout.replace(tzinfo=utc).astimezone(cest)
-            session.duration = session.logout - session.login
-        
+def user(request, name):
+    today = date.today()
+    user = CUser.all().filter('name = ', name).get()    
+
     c = Context({
-            'online_percent': 100.-100*float(memcache.get("online_users"))/memcache.get("online_peak"),
-            'online_users': memcache.get("online_users"),
+            'user': user,
             'title': name,
-            'sessions': sessions,
+            'timestat1_prev': today - timedelta(days = 7),
+            'timestat2_prev': today - timedelta(days = 30),
             })
     t = loader.get_template("user.html")
     return HttpResponse(t.render(c))
 
-def week(request, page):
-    if page:
-        page = int(page)
-    else:
-        page = 0
-    data = [11]*7
+def create_weekly_graph(query):
+    '''Return an url to the graph'''
+    today = date.today()
+    data = [0]*7
     axes = ''
-    today = datetime.now()
     for day in xrange(1, 8):        
-        dfrom = today - timedelta(days=(7*page + day))
-        dto = dfrom - timedelta(days=(7*(page+1) + day))        
+        dfrom = query - timedelta(days=(day))
+        dto = query - timedelta(days=(7 + day))
         ol = UserNumber.all().filter('time <= ', dfrom).filter('time > ', dto).fetch(100)
         numbers = [f.number for f in ol]
+        numbers = filter(lambda x: x != None, numbers)
         average = sum(numbers)
         if len(numbers):
             average = average / len(numbers)
@@ -152,8 +253,162 @@ def week(request, page):
     G.size(200,40)
     G.marker('B', 'E6F2FA',0,0,0)
     G.line(1,0,0)
-    G.title("Week view")
+    G.title(_('Week view'))
     G.size((300,200))
     G.axes.range(1, '0,%d,1' % max(data))
     G.grid(100./7,10)
-    return HttpResponseRedirect(G.url)
+    return G.url
+
+def week(request, year, month, day):
+    today = datetime.now()
+    try:
+        query = datetime(int(year), int(month), int(day))
+    except:
+        return HttpResponseBadRequest()
+    if today - query > timedelta(days=7):
+        ws = WeeklyStat.all().filter('day = ', query).get()
+        if not ws:
+            ws = WeeklyStat()
+            ws.day = query
+            ws.url = create_weekly_graph(query)
+            ws.put()
+        url = ws.url
+    else:
+        url = create_weekly_graph(query)
+    return HttpResponseRedirect(url)
+
+def timestat(request, duration, user, fyear, fmonth, fday):
+    now = datetime(int(fyear), int(fmonth), int(fday))
+    max_dur = 86400.
+    if duration == 'week':
+        day_r = 7
+        caption = _('Week view')
+        xlabel = "%a"
+        jscriptfn = 'dload_timestat1'
+    elif duration == 'month':
+        day_r = 30
+        caption = _('Month view')
+        xlabel = "%d"
+        jscriptfn = 'dload_timestat2'
+    data = [0]*day_r
+    axes = ''
+    for day in xrange(1,day_r + 1):        
+        dfrom = now - timedelta(days=(day + 1))
+        dto = now - timedelta(days=(day))
+        ol = Session.all().filter('user = ', user).filter('login > ', dfrom).filter('login < ', dto).fetch(100)
+        sum = 0
+        for o in ol:
+            try:
+                sum += (o.logout - o.login).seconds
+            except:
+                pass         
+        data[day_r-day] = sum/max_dur*100.
+        axes = "%s|" % dfrom.strftime(xlabel) + axes
+
+    G = Sparkline(data, encoding='text')
+    G.axes.type('xy')
+    G.axes.label(0, axes)
+    G.color('0077CC')
+    G.size(200,40)
+    G.marker('B', 'E6F2FA',0,0,0)
+    G.line(1,0,0)
+    G.title(caption)
+    G.size((300,200))
+    #G.axes.range(1, '0,%d,1' % 1)
+    G.axes.range(0, (0,1,0.1))
+    G.axes.range(1, (0,day_r))
+    G.grid(100./day_r, 100)
+    if request.method == 'POST':
+        next = now + timedelta(days=day_r)
+        if next > date.today():
+            next = None
+        else:
+            next = next.strftime("%Y-%m-%d")
+        data = Context({
+            'url': G.url,
+            'prev': (now - timedelta(days=day_r)).strftime("%Y-%m-%d"),
+            'next': next,
+            'duration': duration,
+            'title': user,
+            'jscriptfn': jscriptfn,
+        })
+        return HttpResponse(loader.get_template("timestat.html").render(data))
+    else:
+        return HttpResponseRedirect(G.url)
+    
+def hit(request):
+    if request.method == 'POST':
+        h = Hit()
+        h.name = request.POST['user'].strip()
+        h.where = request.POST['where'].lower()
+        try:
+            h.dmg = int(request.POST['dmg'])
+        except:
+            return HttpResponse("%s nem szam" % 
+                                request.POST['dmg'].strip())
+        h.time = datetime.now()
+        h.put()
+        return HttpResponse("Utesed elmentve: %s %d." %
+                            (capitalize(h.where), h.dmg))
+    else:
+        raise Http404
+
+def hits(request, page):
+    if request.method == 'GET':
+        t = loader.get_template("hits.html")
+        hits = Hit.all().order("-time")
+        count = math.ceil(Hit.all().count() / 10.)+1
+        title =  _('Hits')
+    else:
+        t = loader.get_template("ajaxhits.html")
+        name = request.POST['name']
+        page = int(request.POST['page'])
+        hits = Hit.all().filter('name = ', name).order('-time')
+        count = math.ceil(Hit.all().filter('name =', name).count() / 10.)+1
+        title = name
+    if page:
+        try:
+            page = int(page)
+        except:
+            page = 1
+    else:
+        page = 1
+    if page + 1 < count:
+        next = page + 1
+    else:
+        next = 0
+    prange = xrange(page - 3, page + 4)
+    prange = [p for p in prange if p > 0 and p < count]
+    hits = hits.fetch(10, (page-1)*10)
+    for hit in hits:
+        hit.time = hit.time.replace(tzinfo=utc).astimezone(cest)
+    c = Context({
+            'from': page,
+            'next': next,
+            'prev': page - 1,
+            'count': int(count) - 1,
+            'range': prange,
+            'title': title,
+            'hits': hits
+            })
+    return HttpResponse(t.render(c))
+
+def userno(request):
+    return HttpResponse("userno: %d" % get_online_users())
+#    q = UserNumber.all()
+#    r = q.fetch(400)
+#    db.delete(r)
+
+def capitalize(text):
+    words = text.split(' ')
+    words = [word.capitalize() for word in words]
+    return ' '.join(words)
+
+def base_stats(request):
+    data = {
+        'online_percent': "%f%%" % (100.-100*float(get_online_users())/get_online_peak()),
+        'online_users': get_online_users(),
+        'online_peak': get_online_peak(),
+        }
+    data = simplejson.dumps(data, indent=4)
+    return HttpResponse(data, mimetype="text/json")

@@ -359,14 +359,34 @@ width: 254px;
 				background-image: url(/images/parts/map-erepublik-logged.png);
 				background-position: 0px -369px;
 			}
+			#menu ul li#menu1 a div {
+                                color: white;
+                                font-weight: bold;
+                                position: relative;
+                                top: 10px;
+                                left: 10px;
+			}
 			#menu ul li#menu2 a {
 				background-image: url(/images/parts/map-erepublik-logged.png);
 				background-position: -190px -369px;
-
+			}
+			#menu ul li#menu2 a div {
+                                color: white;
+                                font-weight: bold;
+                                position: relative;
+                                top: 10px;
+                                left: 10px;
 			}
 			#menu ul li#menu3 a {
 				background-image: url(/images/parts/map-erepublik-logged.png);
 				background-position: -381px -369px;
+			}
+			#menu ul li#menu3 a div {
+                                color: white;
+                                font-weight: bold;
+                                position: relative;
+                                top: 10px;
+                                left: 10px;
 			}
 			#menu ul li#menu4 a {
 				background-image: url(/images/parts/map-erepublik-logged.png);
@@ -6107,3 +6127,46 @@ font-family: Helvetica,Arial,sans-serif;
 /*--------------------------------------------------*/
 /*					  End Tooltip					*/
 /*--------------------------------------------------*/
+
+/*****************/
+/* MATASZ        */
+/*****************/
+
+.imgcont { 
+  display: block;
+  width: 320px;
+  height: 200px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.imgcont img {
+  display: inline;
+  margin-left: 10px;
+  margin-right: 0px;
+}
+
+.largeprev {
+  position: absolute;
+  display: block;
+  margin: 0;
+/*   padding: 0; */
+  width: 10px;
+  height: 200px;
+  background: url(/images/parts/btn-larg-perv.png) left no-repeat;  )
+}
+.largeprev:hover { 
+  background: url(/images/parts/btn-larg-perv-hover.png) left no-repeat;  )
+}
+.largenext {
+  display: block;
+  position: relative;
+  top: -200;
+  left: 310;
+  width: 10px;
+  height: 200px;
+  background: url(/images/parts/btn-larg-next.png) left no-repeat;  )
+}
+.largenext:hover { 
+  background: url(/images/parts/btn-larg-next-hover.png) left no-repeat;  )
+}

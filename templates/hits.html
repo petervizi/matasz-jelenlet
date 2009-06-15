@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+{% include 'hitstable.html' %}
+<ul class="pager">
+    {% if prev %}
+    <li><a href="/hits" class="first" /></li>
+    <li><a href="/hits/{{ prev }}" class="prev">{% trans "Prev" %}</a></li>
+    {% endif %}
+    {% for p in range %}
+    <li><a href="/hits/{{ p }}" {% ifequal p from %}class="on"{% endifequal %}>{{ p }}</a></li>
+    {% endfor %}
+    {% if next %}
+    <li><a href="/hits/{{ next }}" class="next">{% trans "Next" %}</a></li>
+    <li><a href="/hits/{{ count }}" class="last" /></li>
+    {% endif %}
+</ul>
+
+{% endblock %}

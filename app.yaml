@@ -10,5 +10,10 @@ handlers:
   static_dir: static/images
 - url: /flash
   static_dir: static/flash
+- url: /js
+  static_dir: static/js
+- url: /favicon.ico
+  static_files: static/images/favicon.ico
+  upload: static/images/favicon.ico
 - url: /.*
   script: main.py

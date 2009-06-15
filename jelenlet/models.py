@@ -11,5 +11,17 @@ class UserNumber(BaseModel):
     number = db.IntegerProperty()
 
 class WeeklyStat(BaseModel):
-    week = db.IntegerProperty()
+    day = db.DateTimeProperty()
     url = db.StringProperty()
+
+class CUser(BaseModel):
+    name = db.StringProperty()
+    lastlogin = db.DateTimeProperty()
+    online = db.BooleanProperty()
+    online_time = db.IntegerProperty()
+    
+class Hit(BaseModel):
+    name = db.StringProperty()
+    time = db.DateTimeProperty()
+    where = db.StringProperty()
+    dmg = db.IntegerProperty()

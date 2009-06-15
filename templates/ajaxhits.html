@@ -1,0 +1,16 @@
+{% load i18n %}
+
+{% include 'hitstable.html' %}
+<ul class="pager">
+    {% if prev %}
+    <li><a href="#" onClick="dload_hits('{{ title }}', 1)" class="first" /></li>
+    <li><a href="#" onClick="dload_hits('{{ title }}', {{ prev }})"class="prev">{% trans "Prev" %}</a></li>
+    {% endif %}
+    {% for p in range %}
+    <li><a href="#" onClick="dload_hits('{{ title }}',{{ p }})" {% ifequal p from %}class="on"{% endifequal %}>{{ p }}</a></li>
+    {% endfor %}
+    {% if next %}
+    <li><a href="#" onClick="dload_hits('{{ title }}',{{ next }})" class="next">{% trans "Next" %}</a></li>
+    <li><a href="#" onClick="dload_hits('{{ title }}',{{ count }})" class="last" /></li>
+    {% endif %}
+</ul>

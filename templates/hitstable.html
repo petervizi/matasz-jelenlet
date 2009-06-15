@@ -1,0 +1,9 @@
+{% load i18n %}
+
+<table width="690" border="0" align="left" cellpadding="0" cellspacing="0" class="offers">
+    <caption>{% trans "Hits" %}</caption>
+  <tr class="yellow"><th width="173">{% trans "User" %}</th><th width="173">{% trans "Time" %}</th><th width="173">{% trans "Location" %}</th><th width="173">{% trans "Damage" %}</th></tr>
+  {% for hit in hits %}
+    <tr><td><a href="/user/{{ hit.name }}">{{ hit.name }}</a></td><td>{{ hit.time|date:"Y.m.d. H:i" }}</td><td>{{ hit.where|title }}</td><td>{{ hit.dmg }}</td></tr>
+  {% endfor %}
+</table>

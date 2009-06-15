@@ -1,3 +1,7 @@
+#
+# Based on Ernst's chanstats2.01
+#
+
 # INSTALLATION
 
 #   i) Place this TCL into your eggdrop/scripts directory,
@@ -7,30 +11,59 @@
 
 # CONFIGURATION
 
-# There are three variables you should configure, that are
-# self-explanatory: login_url, logout_url and ch_name
-
-set login_url "http://localhost:8080/login"
-set logout_url "http://localhost:8080/logout"
-set ch_name "#nomnom"
+set log_url(#matasz) "http://matasz-jelenlet.appspot.com"
 
 package require http
 
-bind join - "$ch_name *!*@*" join:report_login
+bind join - * stats_join
+bind part - * stats_part
+bind kick - * stats_kick
+bind nick - * stats_nick
+bind splt - * stats_splt
+bind rejn - * stats_rejn
+bind sign - * stats_sign
 
-bind part - "$ch_name *!*@*" part:report_logout
-bind sign - "$ch_name *!*@*" part:report_logout
-
-proc join:report_login { nick host hand chan } {
-    global login_url
-    set query [http::formatQuery "user" $nick]
-    http::geturl $login_url -query $query
+proc stats_join {nick uhost hand chan} {
+    global log_url botnick
+    set chan [string tolower $chan]
+    if {[info exists log_url($chan)]} {
+	set query [http::formatQuery "user" $nick]
+	http::geturl "$log_url($chan)/login" -query $query
+    }
     return 0
 }
 
-proc part:report_logout { nick host hand chan msg } {
-    global logout_url
-    set query [http::formatQuery "user" $nick]
-    http::geturl $logout_url -query $query
+proc stats_part { nick uhost hand chan msg } {
+    global log_url botnick
+    set chan [string tolower $chan]
+    if {[info exists log_url($chan)]} {
+	set query [http::formatQuery "user" $nick]
+	http::geturl "$log_url($chan)/logout" -query $query
+    }
+}
+
+proc stats_sign {nick uhost hand chan reason} {
+    return [stats_part $nick $uhost $hand $chan $reason]
+}
+
+proc stats_kick {nick uhost hand chan kicked reason} {
+    return [stats_part $nick $uhost $hand $chan ""]
+}
+
+proc stats_nick {nick uhost hand chan newnick} {
+    global log_url
+    set chan [string tolower $chan]
+    if {[info exists log_url($chan)]} {
+	set query [http::formatQuery "old" $nick "new" $newnick]
+	http::geturl "$log_url($chan)/nickchange" -query $query
+    }
     return 0
+}
+
+proc stats_splt {nick uhost hand chan} {
+    return [stats_part $nick $uhost $hand $chan ""]
+}
+
+proc stats_rejn {nick uhost hand chan} {
+    return [stats_join $nick $uhost $hand $chan]
 }
