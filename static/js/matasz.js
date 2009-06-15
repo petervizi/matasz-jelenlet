@@ -30,16 +30,6 @@ function display_sessions(transport) {
     $('sessionstable').update( transport.responseText);
 }
 
-function dload_base_stats() {
-    var myA = new Ajax.Request(
-			       '/base_stats/',
-			       {
-				   method: 'get',
-				   onSuccess: display_base_stats
-			       }
-			       );
-}
-
 function display_base_stats(transport) {
     var response = transport.responseText.evalJSON();
     $('online_peak').update(response.online_peak);
@@ -75,3 +65,4 @@ function dload_timestat2(arg1, arg2) {
 			 }
 		    });
 }
+

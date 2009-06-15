@@ -3,23 +3,24 @@
 {% load i18n %}
 
 {% block content %}
-
 <div class="imgcont" id="timestat1"><img src="/images/parts/spinner_big.gif" id="dload_timestat1img" /></div>
 <div class="imgcont" id="timestat2"><img src="/images/parts/spinner_big.gif" id="dload_timestat2img" /></div>
 
 <div id="sessionstable"></div>
 <div id="hitstable"></div>
 <script type="text/javascript">
-    Event.observe(window, 'load', dload_timestat1('{{ title }}', '{% now "Y-m-d" %}'));
-</script>
-<script type="text/javascript">
-    Event.observe(window, 'load', dload_timestat2('{{ title }}', '{% now "Y-m-d" %}'));
-</script>
-<script type="text/javascript">
-    Event.observe(window, 'load', dload_sessions('{{ title }}', 1));
-</script>
-<script type="text/javascript">
-    Event.observe(window, 'load',  dload_hits('{{ title }}', 1));
-</script>
 
+Event.observe(window, 'load', function(){
+	dload_timestat1('{{ title }}', '{% now "Y-m-d" %}');
+});
+Event.observe(window, 'load', function(){
+	dload_timestat2('{{ title }}', '{% now "Y-m-d" %}');
+    });
+Event.observe(window, 'load', function(){
+	dload_sessions('{{ title }}', 1);
+    });
+Event.observe(window, 'load', function(){
+	dload_hits('{{ title }}', 1);
+    });
+</script>
 {% endblock %}

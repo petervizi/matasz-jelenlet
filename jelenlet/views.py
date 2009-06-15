@@ -104,7 +104,7 @@ def list(request, list_from=0):
 
 def login(request):
     if request.method == 'POST':
-        logging.debug('login')
+        logging.info('login')
         #dsession = db.GqlQuery("SELECT * FROM Session WHERE user = :1 AND logout < :2",
         #                       request.POST['user'], 0)
         #dsession = dsession.get()        
@@ -115,22 +115,27 @@ def login(request):
         session = Session()
         session.user = request.POST['user']
         session.put()
+        logging.info("user %s" % session.user)
         n = UserNumber.all().order('-time').get()
+        logging.info('UserNumber %s' % n)
         if (n is None) or (n.number is None):
+            logging.info('UserNumber was None')
             n = 0
-        elif n.number:
+        else:
+            logging.info('UserNumber was %d', n.number)
             n = n.number
         userno = UserNumber()
         try:
-            userno.number = int(n + 1)
+            userno.number = int(n) + 1
         except:
-            loggin.debug('Number was not a number!')
-            userno.number = 0
+            logging.info('Number was not a number!')
+            userno.number = 1
+        logging.info('New UserNumber %d' % userno.number)
         userno.put()
         duser = CUser.all().filter('name = ', request.POST['user'])
         duser = duser.get()
         if not duser:
-            logging.debug('Creating new user.')
+            logging.info('Creating new user.')
             duser = CUser()
             duser.name = request.POST['user']
             duser.online_time = 0
@@ -143,20 +148,23 @@ def login(request):
 
 def logout(request):
     if request.method == 'POST':
-        logging.debug('logout')
+        logging.info('logout')
         session_q = Session.all()
         session_q.filter('user = ', request.POST['user'])
         session_q.order('-login')
         session = session_q.get()
+        logging.info('User %s' % session.user)
         userno = UserNumber()
         n = UserNumber.all().order('-time').get()
         if n is None:
+            logging.info('UserNumber was None')
             n = 0
         else:
+            logging.info('UserNumber was %d' % n.number)
             n = n.number
         if session:
             session.logout = datetime.now()
-            logging.debug('there was a session, closing')
+            logging.info('there was a session, closing')
         else:
             loggin.debug('creating new session')
             session = Session()
@@ -165,22 +173,23 @@ def logout(request):
         session.put()
         duser = CUser.all().filter('name = ', request.POST['user']).get()
         if not duser:
-            logging.debug('creating new user')
+            logging.info('creating new user')
             duser = CUser()
             duser.name = request.POST['user']
             duser.lastlogin = datetime.now()
             duser.online_time = 0
             duser.online = True
         if duser.online:
-            logging.debug('user was online')
+            logging.info('user was online')
             try:
                 userno.number = n - 1
                 if userno.number < 0:
                     userno.number = 0
             except:
-                logging.debug('could not decrease number')
+                logging.info('could not decrease number')
                 userno.number = 0
         duser.online = False
+        logging.info("New UserNumber %d" % userno.number)
         userno.put()            
         delta = duser.lastlogin - datetime.now()
         duser.online_time = duser.online_time + delta.seconds
