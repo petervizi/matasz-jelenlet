@@ -299,6 +299,8 @@ def timestat(request, duration, user, fyear, fmonth, fday):
         sum = 0
         for o in ol:
             try:
+                if o.logout > dto:
+                    o.logout = dto
                 sum += (o.logout - o.login).seconds
             except:
                 pass         
@@ -320,7 +322,7 @@ def timestat(request, duration, user, fyear, fmonth, fday):
     G.grid(100./day_r, 100)
     if request.method == 'POST':
         next = now + timedelta(days=day_r)
-        if next > date.today():
+        if next > datetime.now():
             next = None
         else:
             next = next.strftime("%Y-%m-%d")
