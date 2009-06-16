@@ -219,7 +219,7 @@ line-height:15px; }
 display:block;
 float:left;
 margin-right:8px;
-maring-top: -1px;
+/*maring-top: -1px;*/
 }
 
 #advisor p a{
@@ -660,7 +660,7 @@ width: 254px;
 		
 		body#citizenprofile #content .wellnessmeter{
 			margin: 0px 26px 0px 50px;
-			*margin: 0px 13px 0px 25px;
+                        margin: 0px 13px 0px 25px;
 		}
 		
 		#miniprofile a.strongbtnmini {
@@ -1810,9 +1810,9 @@ margin-left:13px;
 .salesPayBySmsInfo{display:inline; font-weight:bold; float:left; width:541px; height:51px; background:url(/images/parts/IMGMAP_salesPageIcoBut.png) no-repeat 0px -945px; padding-left:10px; padding-right:10px; line-height:50px; margin-top:11px;}
 .salesPayBySmsInfo span{ display:inline; float:left; width:541px; border-bottom:solid 1px #d5d5d5;}
 .salesPayBySmsInfo span.last{ border-bottom:0;width:500px;}
-.salesPayBySmsInfo .value{ color:#FFFFFF; display:inline; float:right; margin-top:1px; margin-right:5px; *margin-top:0px;}
+.salesPayBySmsInfo .value{ color:#FFFFFF; display:inline; float:right; margin-top:1px; margin-right:5px; margin-top:0px;}
 .salesInputCountry{border:1px solid #a6a6a6;height:23px;padding-bottom:2px;padding-right:2px;padding-top:2px;width:219px; display:inline; float:left; margin-left:150px; color:#4d4d4d; margin-top:14px; margin-right:10px;}
-.salesCountryFlag{ display:inline; float:left; margin-top:15px; *margin-top:14px;}
+.salesCountryFlag{ display:inline; float:left; margin-top:15px; margin-top:14px;}
 .costs {border-top: 1px solid #D5D5D5; clear: both; display: inline; float: left; margin: 5px auto 0 150px; padding: 5px 0 0; width: 260px;}
 .currencyValue {background: transparent url(/images/parts/IMGMAP_salesPageIcoBut.png) no-repeat scroll 0 -998px; color: white; float: right; height: 17px; line-height: 17px; padding-left: 4px; text-align: center; width: 45px;}
 .lastCost {float: left;}
@@ -6134,8 +6134,8 @@ font-family: Helvetica,Arial,sans-serif;
 
 .imgcont { 
   display: block;
-  width: 320px;
-  height: 200px;
+  width: 300px;
+  height: 220px;
   text-align: center;
   vertical-align: middle;
 }
@@ -6150,7 +6150,7 @@ font-family: Helvetica,Arial,sans-serif;
   position: absolute;
   display: block;
   margin: 0;
-/*   padding: 0; */
+  padding: 0;
   width: 10px;
   height: 200px;
   background: url(/images/parts/btn-larg-perv.png) left no-repeat;  )
@@ -6161,8 +6161,8 @@ font-family: Helvetica,Arial,sans-serif;
 .largenext {
   display: block;
   position: relative;
-  top: -200;
-  left: 310;
+  top: -200px;
+  left: 310px;
   width: 10px;
   height: 200px;
   background: url(/images/parts/btn-larg-next.png) left no-repeat;  )
