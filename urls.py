@@ -26,6 +26,8 @@ urlpatterns = patterns('',
                        (r'^userno$', 'jelenlet.views.userno'),
                        (r'^base_stats$', 'jelenlet.views.base_stats'),
                        (r'^timestat/(?P<duration>(week)|(month))/(?P<user>.+)/(?P<fyear>\d{4})-(?P<fmonth>\d{2})-(?P<fday>\d{2})', 'jelenlet.views.timestat'),
+                       #(r'^activity$', 'jelenlet.views.activity'),
+                       (r'^activeusers/(?P<duration>(week)|(month))/(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})/(?P<hfrom>\d{2})-(?P<hto>\d{2})', 'jelenlet.views.activeusers'),
                        (r'^hits/(?P<page>\d*)', 'jelenlet.views.hits'),
     # Example:
     # (r'^foo/', include('foo.urls')),

@@ -66,3 +66,57 @@ function dload_timestat2(arg1, arg2) {
 		    });
 }
 
+var Duration = Class.create();
+Duration.setup = function(params) {
+    function param_default(name, def) {
+	if (!params[name]) params[name] = def;
+    }
+    param_default('durationField', null);
+    param_default('triggerElement', null);
+    var triggerElement = $(params.triggerElement);
+    triggerElement.onclick = function() {
+	var duration = new Duration();
+	duration.showAtElmenet(triggerElement);
+	return duration;
+    };    
+}
+// Duration.HOURS = new Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 
+// 			   14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24);
+// Duration.handleMouseDownEvent = function(event) {
+//     Event.observe(document, 'mouseup', Durationalendar.handleMouseUpEvent);
+//     Event.stop(event);
+// }
+// Duration.handleMouseUpEvent = function(event) {
+//     alert('ok');
+//     return Event.stop(event);
+// }
+Duration.prototype = {
+    container: null,
+    initialize: function(parent) {
+	if (parent) {
+	    this.create($(parent));
+	} else {
+	    this.create();
+	}
+    },
+    // Constructor
+    create: function(parent) {
+	if (!parent) {
+	    parent = document.getElementsByTagName('body')[0]
+	}
+	this.container = new Element('div');
+	this.container.update('hello');
+	parent.appendChild(this.container);
+    },
+    show: function() {
+	this.container.show();
+    },
+    showAt: function(x, y) {
+	this.container.setStyle({left: x + 'px', top: y + 'px'});
+	this.show();
+    },
+    showAtElmenet: function(element) {
+	var pos = Position.cumulativeOffset(element);
+	this.showAt(pos[0], pos[1]);
+    },
+}

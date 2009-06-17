@@ -258,7 +258,7 @@ div.advisor #clock.single{margin-top:75px; float:right;}
 		padding: 0px 12px 0px 22px;
 		float: left;
 		display: inline;	
-		background: url(/images/parts/map-erepublik-logged.png) -755px -140px no-repeat;
+                background: url(/images/parts/map-erepublik-logged.png) -755px -140px no-repeat;
 		height:18px;
 		line-height:18px;
 		margin-top:5px;
@@ -6169,4 +6169,26 @@ font-family: Helvetica,Arial,sans-serif;
 }
 .largenext:hover { 
   background: url(/images/parts/btn-larg-next-hover.png) left no-repeat;  )
+}
+
+#date { 
+  padding: 0px 12px 0px 22px;
+  float: left;
+  display: inline;	
+  background: url(/images/parts/map-erepublik-logged.png) -755px -140px no-repeat;
+  height:18px;
+  line-height:18px;
+  margin-top:5px;
+  margin-bottom:6px;
+}
+
+#duration {
+  padding: 0px 12px 0px 22px;
+  float: left;
+  display: inline;	
+  background: url(/images/parts/map-erepublik-logged.png) -755px -159px no-repeat;
+  height:18px;
+  line-height:18px;
+  margin-top:5px;
+  margin-bottom:6px;
 }

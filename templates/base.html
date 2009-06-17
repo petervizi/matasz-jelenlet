@@ -9,9 +9,12 @@
     <link rel="stylesheet" href="http://www.erepublik.com/css/happybday.css" type="text/css" />
     <link rel="stylesheet" href="http://www.erepublik.com/css/sIFR-screen.css" type="text/css" media="screen" />
     <link rel="stylesheet" href="http://www.erepublik.com/css/sIFR-print.css" type="text/css" media="print" />
+    {% block stylesheet %}
+    {% endblock %}
     <script type="text/javascript" src="http://www.erepublik.com/js/global.js"></script>
     <!-- <script type="text/javascript" src="http://www.google.com/jsapi"></script> -->
     <script type="text/javascript" src="/js/prototype.js"></script>
+
     <script type="text/javascript" src="/js/matasz.js" defer="defer"></script>
     <link rel="stylesheet" type="text/css" media="screen" href="http://www.erepublik.com/css/thickbox.css" />
 
@@ -35,6 +38,7 @@
 	    <li id="menu2"><a href="#"><div>{% trans "Presence" %}</div></a>
 	      <ul>
 		<li><a href="/list">{% trans "List" %}</a></li>
+                <li><a href="/activity">{% trans "Activity" %}</a></li>
 	      </ul>
 	    </li>
 	    <li id="menu3"><a href="#"><div>{% trans "Hits" %}</div></a>

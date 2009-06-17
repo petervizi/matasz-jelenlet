@@ -20,6 +20,8 @@ import math
 from tz import utc, cest
 import logging
 
+from operator import itemgetter
+
 def get_online_users():
     data = memcache.get('online_users')
     if data is None:
@@ -423,3 +425,51 @@ def base_stats(request):
         }
     data = simplejson.dumps(data, indent=4)
     return HttpResponse(data, mimetype="text/json")
+
+def f9(seq):
+    # Not order preserving
+    return {}.fromkeys(seq).keys()
+
+def activeusers(request, duration, year, month, day, hfrom, hto):
+    try:
+        dfrom = datetime(int(year), int(month), int(day), int(hfrom))
+        dto = datetime(int(year), int(month), int(day), int(hto))
+        delta = (dto - dfrom).seconds
+    except:
+        return HttpResponseBadRequest()
+    if duration == 'week':
+        day_range = 7
+    elif duration == 'month':
+        day_range = 30
+    else:
+        return HttpResponseBadRequest()
+    maxd = delta * day_range
+    stat = {}
+    for i in xrange(1, 1+day_range):
+        dfrom = dfrom - timedelta(days=1)
+        dto = dto - timedelta(days=1)
+        sessions1 = Session.all(keys_only=True).filter('login < ', dto).filter('login > ', dfrom).fetch(100)
+        sessions2 = Session.all(keys_only=True).filter('logout < ', dto).filter('logout > ', dfrom).fetch(100)
+        sessions1.extend(sessions2)
+        sessions1 = f9(sessions1)
+        sessions = Session.get(sessions1)
+        for session in sessions:
+            if session.login < dfrom:
+                session.login = dfrom
+            if session.logout and session.logout > dto:
+                session.logout = dto
+            else:
+                session.logout = session.login
+            if session.user in stat:
+                stat[session.user] += (session.logout - session.login).seconds
+            else:
+                stat[session.user] = (session.logout - session.login).seconds
+    stat = sorted(stat.iteritems(), key=itemgetter(1), reverse = True)
+    #stat = sorted(stat.iteritems(), key=lambda (k,v):(v,k), reverse=True)
+    c = Context({'sorted': stat,
+                 'maxd': maxd})
+    return HttpResponse(loader.get_template("activeusers.html").render(c))
+
+def activity(request):
+    c = Context({})
+    return HttpResponse(loader.get_template('activity.html').render(c))
