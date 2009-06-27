@@ -81,11 +81,15 @@ def list(request, list_from=0):
         t = loader.get_template('ajaxlist.html')
         title = name
 
-    count = math.ceil(sessions.count() / 10.)+1    
+    session_per_page = 10
+    if 'session_per_page' in request.COOKIES:
+        session_per_page = int(request.COOKIES['session_per_page'])
+    count = math.ceil(sessions.count() / session_per_page)+1
     next = 0
+    logging.info("session_per_page %d" % session_per_page)
     if list_from + 1 < count:
         next = list_from + 1
-    thesessions = sessions.fetch(10, (list_from - 1)*10)
+    thesessions = sessions.fetch(session_per_page, (list_from - 1)*session_per_page)
     for session in thesessions:
         session.login = session.login.replace(tzinfo=utc).astimezone(cest)
         if session.logout:
@@ -102,6 +106,7 @@ def list(request, list_from=0):
             'range': prange,
             'sessions': thesessions,
             'title': title,
+            'session_per_page':session_per_page,
             })
     return HttpResponse(t.render(c))
 
@@ -382,10 +387,14 @@ def getdatefromstring(string):
 
 
 def hits(request, page):
+    hits_per_page = 10
+    if 'hits_per_page' in request.COOKIES:
+        hits_per_page = int(request.COOKIES['hits_per_page'])
+    logging.info("hits_per_page %d" % hits_per_page)
     if request.method == 'GET':
         t = loader.get_template("hits.html")
         hits = Hit.all().order("-time")
-        count = math.ceil(Hit.all().count() / 10.)+1
+        count = math.ceil(Hit.all().count() / hits_per_page)+1
         title =  _('Hits')
         format = 'html'
     else:
@@ -412,7 +421,7 @@ def hits(request, page):
             hits.filter("time > ", time)
             hits.filter("time < ", max)
         hits.order('-time')
-        count = math.ceil(Hit.all().filter('name =', name).count() / 10.)+1
+        count = math.ceil(Hit.all().filter('name =', name).count() / hits_per_page)+1
         title = name
     if page:
         try:
@@ -429,7 +438,7 @@ def hits(request, page):
         next = 0
     prange = xrange(page - 3, page + 4)
     prange = [p for p in prange if p > 0 and p < count]
-    hits = hits.fetch(10, (page-1)*10)
+    hits = hits.fetch(hits_per_page, (page-1)*hits_per_page)
     logging.info("len(hits) %d" % len(hits))
     if format == 'html':
         for hit in hits:
@@ -441,7 +450,8 @@ def hits(request, page):
                 'count': int(count) - 1,
                 'range': prange,
                 'title': title,
-                'hits': hits
+                'hits': hits,
+                'hits_per_page': hits_per_page,
                 })
         return HttpResponse(t.render(c))
     elif format == 'json':

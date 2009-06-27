@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load i18n %}
+{% load exprtag %}
 
 {% block content %}
 {% trans "Name" %}<input type="text" id="searchname" name="name" /><input type="button" value="{% trans "Search" %}" class="marketbtn" onclick="submit_session_search()" />
@@ -12,6 +13,18 @@
     <tr><td><a href="/user/{{ session.user }}">{{ session.user }}</a></td><td>{{ session.login|date:"Y.m.d. H:i" }}</td><td>{{ session.logout|date:"Y.m.d. H:i" }}</td><td>{{ session.duration }}</td></tr>
   {% endfor %}
 </table>
+    {% expr session_per_page > 10 as what %}
+    {% if what %}
+    <a href="javascript:decrease_page('session_per_page');location.reload(true);"><img src="/images/parts/pager_arrow-small-up_active.gif" alt="more sessions" /></a>
+    {% else %}
+    <img src="/images/parts/pager_arrow-small-up_inactive.gif" alt="more sessions" />
+      {% endif %}
+    {% expr session_per_page < 90 as what %}
+      {% if what %}
+    <a href="javascript:increase_page('session_per_page');location.reload(true);"><img src="/images/parts/pager_arrow-small-down_active.gif" alt="more sessions" /></a>
+      {% else %}
+      <img src="/images/parts/pager_arrow-small-down_inactive.gif" alt="more sessions" />
+	{% endif %}
 <ul class="pager">
     {% if prev %}
     <li><a href="/list" class="first" /></li>

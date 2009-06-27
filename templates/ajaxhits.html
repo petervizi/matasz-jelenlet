@@ -1,6 +1,19 @@
 {% load i18n %}
+{% load exprtag %}
 
 {% include 'hitstable.html' %}
+{% expr hits_per_page > 10 as what %}
+{% if what %}
+    <a href="javascript:decrease_page('hits_per_page');dload_hits('{{ title }}',{{ from }});"><img src="/images/parts/pager_arrow-small-up_active.gif" alt="more sessions" /></a>
+{% else %}
+    <img src="/images/parts/pager_arrow-small-up_inactive.gif" alt="more sessions" />
+{% endif %}
+{% expr hits_per_page < 90 as what %}
+{% if what %}
+    <a href="javascript:increase_page('hits_per_page');dload_hits('{{ title }}',{{ from }});"><img src="/images/parts/pager_arrow-small-down_active.gif" alt="more sessions" /></a>
+{% else %}
+      <img src="/images/parts/pager_arrow-small-down_inactive.gif" alt="more sessions" />
+{% endif %}
 <ul class="pager">
     {% if prev %}
     <li><a href="#" onClick="dload_hits('{{ title }}', 1)" class="first" /></li>
