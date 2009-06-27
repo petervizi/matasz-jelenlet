@@ -6192,3 +6192,11 @@ font-family: Helvetica,Arial,sans-serif;
   margin-top:5px;
   margin-bottom:6px;
 }
+#searchname { 
+  font-size: 12px;
+  width: 100px;
+  margin: 0px 5px 0px 5px;
+  padding: 0px 0px 0px 0px;
+  border:1px solid #d9d9d9;
+  color: #868686;
+}

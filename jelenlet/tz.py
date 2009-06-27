@@ -19,6 +19,16 @@ class UTC(tzinfo):
 
     def dst(self, dt):
         return timedelta(0)
+class EREP(tzinfo):
+    """eRepublik timezone"""
+    def utcoffset(self, dt):
+        return - timedelta(hours=7)
+    def dst(self, dt):
+        return timedelta(0)
+    def tzname(self, dt):
+        return "EREP"
 
 cest = CEST()
 utc = UTC()
+erep = EREP()
+erepstart = datetime(2007, 11, 20)

@@ -1,3 +1,4 @@
+import re
 import sys
 sys.path.insert(0, 'GChartWrapper.zip')
 
@@ -366,17 +367,51 @@ def hit(request):
     else:
         raise Http404
 
+DATEREG = re.compile("(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})")
+def getdatefromstring(string):
+    '''Return a datetime from a string: 2009-01-01'''
+    m = DATEREG.match(string)
+    if m:
+        year = int(m.group('year'))
+        month = int(m.group('month'))
+        day = int(m.group('day'))        
+        dd = datetime(year, month, day)
+    else:
+        dd = datetime.today()
+    return dd
+
+
 def hits(request, page):
     if request.method == 'GET':
         t = loader.get_template("hits.html")
         hits = Hit.all().order("-time")
         count = math.ceil(Hit.all().count() / 10.)+1
         title =  _('Hits')
+        format = 'html'
     else:
         t = loader.get_template("ajaxhits.html")
-        name = request.POST['name']
-        page = int(request.POST['page'])
-        hits = Hit.all().filter('name = ', name).order('-time')
+        name = request.POST.get('name', '')
+        page = request.POST.get('page', 0)
+        time = str(request.POST.get('time', ''))
+        if time:
+            time = getdatefromstring(time)
+        where = str(request.POST.get('where', ''))
+        format = request.POST.get('format', 'html')
+        logging.info("format %s" % format)
+        # Here comes the bot's request
+        hits = Hit.all()
+        if name:
+            hits.filter('name = ', name)
+            logging.info("name %s", name)
+        if where:
+            hits.filter('where = ', where)
+            logging.info("where %s", where)
+        if time:
+            logging.info("time %s" % time)
+            max = time + timedelta(days = 1)
+            hits.filter("time > ", time)
+            hits.filter("time < ", max)
+        hits.order('-time')
         count = math.ceil(Hit.all().filter('name =', name).count() / 10.)+1
         title = name
     if page:
@@ -386,6 +421,8 @@ def hits(request, page):
             page = 1
     else:
         page = 1
+    logging.info("page %d" % page)
+
     if page + 1 < count:
         next = page + 1
     else:
@@ -393,18 +430,46 @@ def hits(request, page):
     prange = xrange(page - 3, page + 4)
     prange = [p for p in prange if p > 0 and p < count]
     hits = hits.fetch(10, (page-1)*10)
-    for hit in hits:
-        hit.time = hit.time.replace(tzinfo=utc).astimezone(cest)
-    c = Context({
-            'from': page,
-            'next': next,
-            'prev': page - 1,
-            'count': int(count) - 1,
-            'range': prange,
-            'title': title,
-            'hits': hits
-            })
-    return HttpResponse(t.render(c))
+    logging.info("len(hits) %d" % len(hits))
+    if format == 'html':
+        for hit in hits:
+            hit.time = hit.time.replace(tzinfo=utc).astimezone(cest)
+        c = Context({
+                'from': page,
+                'next': next,
+                'prev': page - 1,
+                'count': int(count) - 1,
+                'range': prange,
+                'title': title,
+                'hits': hits
+                })
+        return HttpResponse(t.render(c))
+    elif format == 'json':
+        sum = 0
+        data = {}
+        for hit in hits:
+            hit.where = hit.where.capitalize()
+            sum += hit.dmg
+            if hit.where in data:
+                if hit.time.strftime("%Y-%m-%d") in data[hit.where]:
+                    data[hit.where][hit.time.strftime("%Y-%m-%d")] += hit.dmg
+                else:
+                    data[hit.where][hit.time.strftime("%Y-%m-%d")] = hit.dmg
+            else:
+                data[hit.where] = {}
+                data[hit.where][hit.time.strftime("%Y-%m-%d")] = hit.dmg            
+        try:
+            value = {
+                'err': False,
+                'sum': sum,
+                'data': data,
+                }
+            data = simplejson.dumps(value, indent=4)
+            return HttpResponse(data, mimetype="text/json")
+        except Exception, e:
+            return HttpResponse("itt a bibi %s" % e)
+    else:
+        pass
 
 def userno(request):
     return HttpResponse("userno: %d" % get_online_users())
@@ -473,3 +538,4 @@ def activeusers(request, duration, year, month, day, hfrom, hto):
 def activity(request):
     c = Context({})
     return HttpResponse(loader.get_template('activity.html').render(c))
+

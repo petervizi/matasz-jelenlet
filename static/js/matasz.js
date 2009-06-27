@@ -120,3 +120,10 @@ Duration.prototype = {
 	this.showAt(pos[0], pos[1]);
     },
 }
+
+function submit_session_search() {
+    dload_sessions($('searchname').value, 1);
+}
+function submit_hits_search() {
+    dload_hits($('searchname').value, 1);
+}

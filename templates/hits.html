@@ -3,6 +3,9 @@
 {% load i18n %}
 
 {% block content %}
+{% trans "Name" %}<input type="text" id="searchname" name="name" /><input type="button" value="{% trans "Search" %}" class="marketbtn" onclick="submit_hits_search()" />
+
+<div id="hitstable">
 {% include 'hitstable.html' %}
 <ul class="pager">
     {% if prev %}
@@ -17,5 +20,5 @@
     <li><a href="/hits/{{ count }}" class="last" /></li>
     {% endif %}
 </ul>
-
+</div>
 {% endblock %}

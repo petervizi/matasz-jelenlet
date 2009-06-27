@@ -11,7 +11,8 @@
 
 # CONFIGURATION
 
-set log_url(#matasz) "http://matasz-jelenlet.appspot.com"
+set log_url(#hunyadi) "http://hunyadiszazad.appspot.com"
+set log_url(#matasz) "http://localhost:8080"
 
 package require http
 

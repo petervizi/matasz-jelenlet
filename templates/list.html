@@ -3,7 +3,10 @@
 {% load i18n %}
 
 {% block content %}
-<table width="690" border="0" align="left" cellpadding="0" cellspacing="0" class="offers">
+{% trans "Name" %}<input type="text" id="searchname" name="name" /><input type="button" value="{% trans "Search" %}" class="marketbtn" onclick="submit_session_search()" />
+
+<div id="sessionstable">
+<table width="690" border="0" align="left" cellpadding="0" cellspacing="0" class="offers" >
   <tr class="yellow"><th width="173">{% trans "User" %}</th><th width="173">{% trans "Login" %}</th><th width="173">{% trans "Logout" %}</th><th width="173">{% trans "Duration" %}</th></tr>
   {% for session in sessions %}
     <tr><td><a href="/user/{{ session.user }}">{{ session.user }}</a></td><td>{{ session.login|date:"Y.m.d. H:i" }}</td><td>{{ session.logout|date:"Y.m.d. H:i" }}</td><td>{{ session.duration }}</td></tr>
@@ -22,4 +25,5 @@
     <li><a href="/list/{{ count }}" class="last" /></li>
     {% endif %}
 </ul>
+</div>
 {% endblock %}
