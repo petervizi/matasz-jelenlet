@@ -7,46 +7,50 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-06-27 18:17+0000\n"
-"PO-Revision-Date: 2009-06-27 20:18+0200\n"
+"POT-Creation-Date: 2009-06-28 19:59+0000\n"
+"PO-Revision-Date: 2009-06-28 22:02+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: jelenlet/views.py:62
+#: jelenlet/views.py:63
 msgid "Welcome"
 msgstr "Üdvözlet"
 
-#: jelenlet/views.py:76 templates/base.html:56
+#: jelenlet/views.py:77 templates/base.html:56
 msgid "List"
 msgstr "Lista"
 
-#: jelenlet/views.py:268 jelenlet/views.py:297 templates/index.html:7
+#: jelenlet/views.py:274 jelenlet/views.py:303 templates/index.html:7
 msgid "Week view"
 msgstr "Heti nézet"
 
-#: jelenlet/views.py:302
+#: jelenlet/views.py:308
 msgid "Month view"
 msgstr "Havi nézet"
 
-#: jelenlet/views.py:389 templates/base.html:60 templates/hitstable.html:4
+#: jelenlet/views.py:399 templates/base.html:60 templates/hitstable.html:4
 msgid "Hits"
 msgstr "Ütések"
+
+#: jelenlet/views.py:574
+msgid "Logins during last week"
+msgstr "Bejelentkezések a múlt héten"
 
 #: templates/404.html:6 templates/500.html:6 templates/base.html:5
 #: templates/base.html.py:48
 msgid "MATASZ Presence"
 msgstr "Hunyadi Század"
 
-#: templates/ajaxhits.html:7 templates/ajaxlist.html:13 templates/hits.html:13
-#: templates/list.html:18
+#: templates/ajaxhits.html:20 templates/ajaxlist.html:25
+#: templates/hits.html:26 templates/list.html:31
 msgid "Prev"
 msgstr "Előző"
 
-#: templates/ajaxhits.html:13 templates/ajaxlist.html:19
-#: templates/hits.html:19 templates/list.html:24
+#: templates/ajaxhits.html:26 templates/ajaxlist.html:31
+#: templates/hits.html:32 templates/list.html:37
 msgid "Next"
 msgstr "Következő"
 
@@ -54,19 +58,19 @@ msgstr "Következő"
 msgid "Sessions"
 msgstr "Bejelentkezések"
 
-#: templates/ajaxlist.html:5 templates/hitstable.html:5 templates/list.html:10
+#: templates/ajaxlist.html:5 templates/hitstable.html:5 templates/list.html:11
 msgid "User"
 msgstr "Felhasználó"
 
-#: templates/ajaxlist.html:5 templates/list.html:10
+#: templates/ajaxlist.html:5 templates/list.html:11
 msgid "Login"
 msgstr "Bejelentkezés"
 
-#: templates/ajaxlist.html:5 templates/list.html:10
+#: templates/ajaxlist.html:5 templates/list.html:11
 msgid "Logout"
 msgstr "Kijelentkezés"
 
-#: templates/ajaxlist.html:5 templates/list.html:10
+#: templates/ajaxlist.html:5 templates/list.html:11
 msgid "Duration"
 msgstr "Időtartam"
 
@@ -86,36 +90,39 @@ msgstr "Aktivitás"
 msgid "List of hits"
 msgstr "Ütések listája"
 
-#: templates/base.html:78
+#: templates/base.html:63
+msgid "Hits by location"
+msgstr ""
+
+#: templates/base.html:79
 msgid "MATASZ"
 msgstr "Hunyadi Század"
 
-#: templates/base.html:83
+#: templates/base.html:84
 msgid "Number of users relative to peak"
 msgstr "Felhasználók aránya az peakhez képest"
 
-#: templates/base.html:86
+#: templates/base.html:87
 msgid "Number of users"
 msgstr "Felhasználók száma"
 
-#: templates/base.html:95
+#: templates/base.html:96
 msgid "Online peak"
 msgstr "Online peak"
 
-#: templates/base.html:110
+#: templates/base.html:111
 msgid "logout"
 msgstr "kijelentkezés"
 
-#: templates/hits.html:6 templates/list.html:6
-#, fuzzy
+#: templates/hits.html:7 templates/list.html:7
 msgid "Name"
-msgstr "Sebzés"
+msgstr "Név"
 
-#: templates/hits.html:6 templates/list.html:6
+#: templates/hits.html:7 templates/list.html:7
 msgid "Search"
 msgstr "Keres"
 
-#: templates/hitstable.html:5
+#: templates/hitstable.html:5 templates/region.html:9
 msgid "Time"
 msgstr "Idő"
 
@@ -123,9 +130,13 @@ msgstr "Idő"
 msgid "Location"
 msgstr "Hely"
 
-#: templates/hitstable.html:5
+#: templates/hitstable.html:5 templates/region.html:9
 msgid "Damage"
 msgstr "Sebzés"
+
+#: templates/region.html:9
+msgid "Erep Time"
+msgstr "Erep Idő"
 
 #~ msgid ""
 #~ "404 This page can not be found. Make sure to look for it under the bed!"

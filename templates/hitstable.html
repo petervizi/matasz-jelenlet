@@ -4,6 +4,11 @@
     <caption>{% trans "Hits" %}</caption>
   <tr class="yellow"><th width="173">{% trans "User" %}</th><th width="173">{% trans "Time" %}</th><th width="173">{% trans "Location" %}</th><th width="173">{% trans "Damage" %}</th></tr>
   {% for hit in hits %}
-    <tr><td><a href="/user/{{ hit.name }}">{{ hit.name }}</a></td><td>{{ hit.time|date:"Y.m.d. H:i" }}</td><td>{{ hit.where|title }}</td><td>{{ hit.dmg }}</td></tr>
+    <tr>
+      <td><a href="/user/{{ hit.name }}">{{ hit.name|title }}</a></td>
+      <td>{{ hit.time|date:"Y.m.d. H:i" }}</td>
+      <td><a href="/region/{{ hit.where}}">{{ hit.where|title }}</a></td>
+      <td>{{ hit.dmg }}</td>
+    </tr>
   {% endfor %}
 </table>

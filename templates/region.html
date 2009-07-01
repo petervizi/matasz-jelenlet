@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load exprtag %}
+{% load erepdaytag %}
+
+{% block content %}
+<table width="690" border="0" align="left" cellpadding="0" cellspacing="0" class="offers" >
+    <tr><th width="230">{% trans "Time" %}</th><th width="230">{% trans "Erep Time" %}</th><th width="230">{% trans "Damage" %}</th></tr>
+    {% for time in table %}
+    <tr><td>{{ time|date:"Y.m.d." }}</td><td>{{ time|erepday }}</td><td>{% expr table[time] %}</td></tr>
+    {% endfor %}
+  </table>
+{% endblock %}

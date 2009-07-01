@@ -4,7 +4,7 @@
     <caption>{% trans "Sessions" %}</caption>
   <tr class="yellow"><th width="173">{% trans "User" %}</th><th width="173">{% trans "Login" %}</th><th width="173">{% trans "Logout" %}</th><th width="173">{% trans "Duration" %}</th></tr>
   {% for session in sessions %}
-    <tr><td><a href="/user/{{ session.user }}">{{ session.user }}</a></td><td>{{ session.login|date:"Y.m.d. H:i" }}</td><td>{{ session.logout|date:"Y.m.d. H:i" }}</td><td>{{ session.duration }}</td></tr>
+    <tr><td><a href="/user/{{ session.user }}">{{ session.user|title }}</a></td><td>{{ session.login|date:"Y.m.d. H:i" }}</td><td>{{ session.logout|date:"Y.m.d. H:i" }}</td><td>{{ session.duration }}</td></tr>
   {% endfor %}
 </table>
 {% expr session_per_page > 10 as what %}

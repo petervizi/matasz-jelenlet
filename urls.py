@@ -26,9 +26,12 @@ urlpatterns = patterns('',
                        (r'^userno$', 'jelenlet.views.userno'),
                        (r'^base_stats$', 'jelenlet.views.base_stats'),
                        (r'^timestat/(?P<duration>(week)|(month))/(?P<user>.+)/(?P<fyear>\d{4})-(?P<fmonth>\d{2})-(?P<fday>\d{2})', 'jelenlet.views.timestat'),
-                       #(r'^activity$', 'jelenlet.views.activity'),
+                       (r'^activity/(?P<user>.+)/(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})$', 'jelenlet.views.activity'),
                        (r'^activeusers/(?P<duration>(week)|(month))/(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})/(?P<hfrom>\d{2})-(?P<hto>\d{2})', 'jelenlet.views.activeusers'),
+                       (r'^region/(?P<location>.+)', 'jelenlet.views.hits_location'),
+                       (r'^regions/(?P<page>\d*)', 'jelenlet.views.hits_regions'),
                        (r'^hits/(?P<page>\d*)', 'jelenlet.views.hits'),
+#                       (r'^tolower/(?P<table>\w+)/(?P<fro>\d*)/(?P<to>\d*)', 'jelenlet.views.tolower'),
     # Example:
     # (r'^foo/', include('foo.urls')),
 

@@ -5,6 +5,7 @@
 {% block content %}
 <div class="imgcont" id="timestat1"><img src="/images/parts/spinner_big.gif" id="dload_timestat1img" /></div>
 <div class="imgcont" id="timestat2"><img src="/images/parts/spinner_big.gif" id="dload_timestat2img" /></div>
+<div class="imgcont" id="timestat3"><img src="/images/parts/spinner_big.gif" id="dload_timestat3img" /></div>
 
 <div id="sessionstable"></div>
 <div id="hitstable"></div>
@@ -15,12 +16,15 @@ Event.observe(window, 'load', function(){
 });
 Event.observe(window, 'load', function(){
 	dload_timestat2('{{ title }}', '{% now "Y-m-d" %}');
-    });
+});
+Event.observe(window, 'load', function(){
+	dload_timestat3('{{ title }}', '{% now "Y-m-d" %}');
+});
 Event.observe(window, 'load', function(){
 	dload_sessions('{{ title }}', 1);
-    });
+});
 Event.observe(window, 'load', function(){
 	dload_hits('{{ title }}', 1);
-    });
+});
 </script>
 {% endblock %}

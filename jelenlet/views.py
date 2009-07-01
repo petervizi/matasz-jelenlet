@@ -1,5 +1,6 @@
 import re
 import sys
+import pickle
 sys.path.insert(0, 'GChartWrapper.zip')
 
 from django.http import *
@@ -10,6 +11,7 @@ from django.utils import simplejson
 from django.core import serializers
 
 from jelenlet.models import *
+from jelenlet.graphs import *
 
 from google.appengine.ext import db
 from google.appengine.api import memcache
@@ -18,7 +20,8 @@ from datetime import datetime, timedelta, date
 from GChartWrapper import *
 import math
 
-from tz import utc, cest
+from tz import utc, cest, erep
+from regions import regions
 import logging
 
 from operator import itemgetter
@@ -35,7 +38,7 @@ def get_online_users():
         else:
             data = data.number
         memcache.set('online_users', data, 120)
-    logging.info('kiadjuk %d', data)
+    #logging.info('kiadjuk %d', data)
     return data
 
 def get_online_peak():
@@ -75,8 +78,8 @@ def list(request, list_from=0):
         t = loader.get_template("list.html")
         title = _('List')
     else:
-        name = request.POST['name']
-        list_from = int(request.POST['page'])
+        name = request.POST.get('name', '').lower()
+        list_from = int(request.POST.get('page', 0))
         sessions = Session.all().filter('user = ', name).order('-login')
         t = loader.get_template('ajaxlist.html')
         title = name
@@ -84,10 +87,10 @@ def list(request, list_from=0):
     session_per_page = 10
     if 'session_per_page' in request.COOKIES:
         session_per_page = int(request.COOKIES['session_per_page'])
-    count = math.ceil(sessions.count() / session_per_page)+1
+    count = math.ceil(sessions.count() / session_per_page)
     next = 0
-    logging.info("session_per_page %d" % session_per_page)
-    if list_from + 1 < count:
+    #logging.info("session_per_page %d" % session_per_page)
+    if list_from < count:
         next = list_from + 1
     thesessions = sessions.fetch(session_per_page, (list_from - 1)*session_per_page)
     for session in thesessions:
@@ -96,8 +99,8 @@ def list(request, list_from=0):
             session.logout = session.logout.replace(tzinfo=utc).astimezone(cest)
             session.duration = session.logout - session.login
 
-    prange = xrange(list_from - 3, list_from + 3)
-    prange = [p for p in prange if p > 0 and p < count]
+    prange = xrange(list_from - 3, list_from + 4)
+    prange = [p for p in prange if p > 0 and p <= count]
     c = Context({
             'from': list_from,
             'next': next,
@@ -112,7 +115,7 @@ def list(request, list_from=0):
 
 def login(request):
     if request.method == 'POST':
-        logging.info('login')
+        #logging.info('login')
         #dsession = db.GqlQuery("SELECT * FROM Session WHERE user = :1 AND logout < :2",
         #                       request.POST['user'], 0)
         #dsession = dsession.get()        
@@ -121,31 +124,31 @@ def login(request):
         #    dsession.logout = datetime.now()            
         #    dsession.put()
         session = Session()
-        session.user = request.POST['user']
+        session.user = request.POST['user'].lower()
         session.put()
-        logging.info("user %s" % session.user)
+        #logging.info("user %s" % session.user)
         n = UserNumber.all().order('-time').get()
-        logging.info('UserNumber %s' % n)
+        #logging.info('UserNumber %s' % n)
         if (n is None) or (n.number is None):
-            logging.info('UserNumber was None')
+            #logging.info('UserNumber was None')
             n = 0
         else:
-            logging.info('UserNumber was %d', n.number)
+            #logging.info('UserNumber was %d', n.number)
             n = n.number
         userno = UserNumber()
         try:
             userno.number = int(n) + 1
         except:
-            logging.info('Number was not a number!')
+            #logging.info('Number was not a number!')
             userno.number = 1
-        logging.info('New UserNumber %d' % userno.number)
+        #logging.info('New UserNumber %d' % userno.number)
         userno.put()
         duser = CUser.all().filter('name = ', request.POST['user'])
         duser = duser.get()
         if not duser:
             logging.info('Creating new user.')
             duser = CUser()
-            duser.name = request.POST['user']
+            duser.name = request.POST['user'].lower()
             duser.online_time = 0
         duser.lastlogin = datetime.now()
         duser.online = True
@@ -156,48 +159,49 @@ def login(request):
 
 def logout(request):
     if request.method == 'POST':
-        logging.info('logout')
+        #logging.info('logout')
         session_q = Session.all()
-        session_q.filter('user = ', request.POST['user'])
+        session_q.filter('user = ', request.POST['user'].lower())
         session_q.order('-login')
         session = session_q.get()
-        logging.info('User %s' % session.user)
+        #logging.info('User %s' % session.user)
         userno = UserNumber()
         n = UserNumber.all().order('-time').get()
         if n is None:
-            logging.info('UserNumber was None')
+            #logging.info('UserNumber was None')
             n = 0
         else:
-            logging.info('UserNumber was %d' % n.number)
+            #logging.info('UserNumber was %d' % n.number)
             n = n.number
-        if session:
-            session.logout = datetime.now()
-            logging.info('there was a session, closing')
+        if session: # XXX wtf?
+            pass
+            #session.logout = datetime.now()
+            #logging.info('there was a session, closing')
         else:
             loggin.debug('creating new session')
             session = Session()
-            session.user = request.POST['user']
+            session.user = request.POST['user'].lower()
             session.logout = session.login
         session.put()
-        duser = CUser.all().filter('name = ', request.POST['user']).get()
+        duser = CUser.all().filter('name = ', request.POST['user'].lower()).get()
         if not duser:
-            logging.info('creating new user')
+            #logging.info('creating new user')
             duser = CUser()
-            duser.name = request.POST['user']
+            duser.name = request.POST['user'].lower()
             duser.lastlogin = datetime.now()
             duser.online_time = 0
             duser.online = True
         if duser.online:
-            logging.info('user was online')
+            #logging.info('user was online')
             try:
                 userno.number = n - 1
                 if userno.number < 0:
                     userno.number = 0
             except:
-                logging.info('could not decrease number')
+                #logging.info('could not decrease number')
                 userno.number = 0
         duser.online = False
-        logging.info("New UserNumber %d" % userno.number)
+        #logging.info("New UserNumber %d" % userno.number)
         userno.put()            
         delta = duser.lastlogin - datetime.now()
         duser.online_time = duser.online_time + delta.seconds
@@ -208,8 +212,8 @@ def logout(request):
 
 def nickchange(request):
     if request.method == 'POST':
-        oldn = request.POST['old']
-        newn = request.POST['new']
+        oldn = request.POST['old'].lower()
+        newn = request.POST['new'].lower()
         ouser = CUser.all().filter('name = ', oldn)
         ouser = ouser.get()
         if not ouser:
@@ -235,7 +239,7 @@ def nickchange(request):
 
 def user(request, name):
     today = date.today()
-    user = CUser.all().filter('name = ', name).get()    
+    user = CUser.all().filter('name = ', name.lower()).get()    
 
     c = Context({
             'user': user,
@@ -248,96 +252,34 @@ def user(request, name):
 
 def create_weekly_graph(query):
     '''Return an url to the graph'''
-    today = date.today()
-    data = [0]*7
-    axes = ''
-    for day in xrange(1, 8):        
-        dfrom = query - timedelta(days=(day))
-        dto = query - timedelta(days=(7 + day))
-        ol = UserNumber.all().filter('time <= ', dfrom).filter('time > ', dto).fetch(100)
-        numbers = [f.number for f in ol]
-        numbers = filter(lambda x: x != None, numbers)
-        average = sum(numbers)
-        if len(numbers):
-            average = average / len(numbers)
-        data[6-day] = average
-        axes = "%s|" % dfrom.strftime("%a") + axes
-
-    G = Sparkline(data, encoding='text')
-    G.axes.type('xy')
-    G.axes.label(0, axes)
-    G.color('0077CC')
-    G.size(200,40)
-    G.marker('B', 'E6F2FA',0,0,0)
-    G.line(1,0,0)
-    G.title(_('Week view'))
-    G.size((300,200))
-    G.axes.range(1, '0,%d,1' % max(data))
-    G.grid(100./7,10)
-    return G.url
 
 def week(request, year, month, day):
-    today = datetime.now()
-    try:
-        query = datetime(int(year), int(month), int(day))
-    except:
-        return HttpResponseBadRequest()
-    if today - query > timedelta(days=7):
-        ws = WeeklyStat.all().filter('day = ', query).get()
-        if not ws:
-            ws = WeeklyStat()
-            ws.day = query
-            ws.url = create_weekly_graph(query)
-            ws.put()
-        url = ws.url
+    cache = GraphCache.all().filter('url = ', request.path)
+    if cache.count() == 1:
+        G = pickle.loads(cache.get())
     else:
-        url = create_weekly_graph(query)
-    return HttpResponseRedirect(url)
+        G = week_graph(int(year), int(month), int(day))
+    return HttpResponseRedirect(G.url)
 
 def timestat(request, duration, user, fyear, fmonth, fday):
+    cache = GraphCache.all().filter('url = ', request.path)
+    if cache.count() == 1:
+        G = pickle.loads(cache.get().graph)
+    else:
+        G = timestat_graph(duration, user, int(fyear), int(fmonth), int(fday))
+        cache = GraphCache()
+        cache.url = request.path
+        cache.graph = pickle.dumps(G)
+        cache.put()
     now = datetime(int(fyear), int(fmonth), int(fday))
-    max_dur = 86400.
-    if duration == 'week':
-        day_r = 7
-        caption = _('Week view')
-        xlabel = "%a"
-        jscriptfn = 'dload_timestat1'
-    elif duration == 'month':
-        day_r = 30
-        caption = _('Month view')
-        xlabel = "%d"
-        jscriptfn = 'dload_timestat2'
-    data = [0]*day_r
-    axes = ''
-    for day in xrange(1,day_r + 1):        
-        dfrom = now - timedelta(days=(day + 1))
-        dto = now - timedelta(days=(day))
-        ol = Session.all().filter('user = ', user).filter('login > ', dfrom).filter('login < ', dto).fetch(100)
-        sum = 0
-        for o in ol:
-            try:
-                if o.logout > dto:
-                    o.logout = dto
-                sum += (o.logout - o.login).seconds
-            except:
-                pass         
-        data[day_r-day] = sum/max_dur*100.
-        axes = "%s|" % dfrom.strftime(xlabel) + axes
-
-    G = Sparkline(data, encoding='text')
-    G.axes.type('xy')
-    G.axes.label(0, axes)
-    G.color('0077CC')
-    G.size(200,40)
-    G.marker('B', 'E6F2FA',0,0,0)
-    G.line(1,0,0)
-    G.title(caption)
-    G.size((300,200))
-    #G.axes.range(1, '0,%d,1' % 1)
-    G.axes.range(0, (0,1,0.1))
-    G.axes.range(1, (0,day_r))
-    G.grid(100./day_r, 100)
+    # gging.info("a graph %s" % G)
     if request.method == 'POST':
+        if duration == 'week':
+            day_r = 7
+            jscriptfn = 'dload_timestat1'
+        elif duration == 'month':
+            day_r = 30
+            jscriptfn = 'dload_timestat2'
         next = now + timedelta(days=day_r)
         if next > datetime.now():
             next = None
@@ -358,7 +300,7 @@ def timestat(request, duration, user, fyear, fmonth, fday):
 def hit(request):
     if request.method == 'POST':
         h = Hit()
-        h.name = request.POST['user'].strip()
+        h.name = request.POST['user'].lower()
         h.where = request.POST['where'].lower()
         try:
             h.dmg = int(request.POST['dmg'])
@@ -390,38 +332,38 @@ def hits(request, page):
     hits_per_page = 10
     if 'hits_per_page' in request.COOKIES:
         hits_per_page = int(request.COOKIES['hits_per_page'])
-    logging.info("hits_per_page %d" % hits_per_page)
+    #logging.info("hits_per_page %d" % hits_per_page)
     if request.method == 'GET':
         t = loader.get_template("hits.html")
         hits = Hit.all().order("-time")
-        count = math.ceil(Hit.all().count() / hits_per_page)+1
+        pcount = math.ceil(Hit.all().count() / hits_per_page)
         title =  _('Hits')
         format = 'html'
     else:
         t = loader.get_template("ajaxhits.html")
         name = request.POST.get('name', '')
         page = request.POST.get('page', 0)
-        time = str(request.POST.get('time', ''))
+        time = request.POST.get('time', '')
         if time:
             time = getdatefromstring(time)
-        where = str(request.POST.get('where', ''))
+        where = request.POST.get('where', '')
         format = request.POST.get('format', 'html')
-        logging.info("format %s" % format)
+        #logging.info("format %s" % format)
         # Here comes the bot's request
         hits = Hit.all()
         if name:
             hits.filter('name = ', name)
-            logging.info("name %s", name)
+            #logging.info("name %s", name)
         if where:
             hits.filter('where = ', where)
-            logging.info("where %s", where)
+            #logging.info("where %s", where)
         if time:
-            logging.info("time %s" % time)
+            #logging.info("time %s" % time)
             max = time + timedelta(days = 1)
             hits.filter("time > ", time)
             hits.filter("time < ", max)
         hits.order('-time')
-        count = math.ceil(Hit.all().filter('name =', name).count() / hits_per_page)+1
+        pcount = math.ceil(hits.count() / hits_per_page)
         title = name
     if page:
         try:
@@ -430,16 +372,15 @@ def hits(request, page):
             page = 1
     else:
         page = 1
-    logging.info("page %d" % page)
+    #logging.info("page %d" % page)
 
-    if page + 1 < count:
+    next = 0
+    if page < pcount:
         next = page + 1
-    else:
-        next = 0
     prange = xrange(page - 3, page + 4)
-    prange = [p for p in prange if p > 0 and p < count]
+    prange = [p for p in prange if p > 0 and p <= pcount]
     hits = hits.fetch(hits_per_page, (page-1)*hits_per_page)
-    logging.info("len(hits) %d" % len(hits))
+    #logging.info("len(hits) %d" % len(hits))
     if format == 'html':
         for hit in hits:
             hit.time = hit.time.replace(tzinfo=utc).astimezone(cest)
@@ -447,7 +388,7 @@ def hits(request, page):
                 'from': page,
                 'next': next,
                 'prev': page - 1,
-                'count': int(count) - 1,
+                'count': int(pcount),
                 'range': prange,
                 'title': title,
                 'hits': hits,
@@ -545,7 +486,93 @@ def activeusers(request, duration, year, month, day, hfrom, hto):
                  'maxd': maxd})
     return HttpResponse(loader.get_template("activeusers.html").render(c))
 
-def activity(request):
-    c = Context({})
-    return HttpResponse(loader.get_template('activity.html').render(c))
+def activity(request, user, year, month, day):
+    if request.method == 'POST':
+        cache = GraphCache.all().filter('url = ', request.path)
+        if cache.count() == 1:
+            G = pickle.loads(cache.get().graph)
+        else:
+            G = activity_graph(user, int(year), int(month), int(day))
+            cache = GraphCache()
+            cache.url = request.path
+            cache.graph = pickle.dumps(G)
+            cache.put()
+        c = Context({})
+        dto = date(int(year), int(month), int(day))
+        next = dto + timedelta(days=7)
+        if next > date.today():
+            next = None
+        else:
+            next = next.strftime("%Y-%m-%d")
+        c = Context({
+                'url': G.url,
+                'prev': (dto - timedelta(days=7)).strftime("%Y-%m-%d"),
+                'next': next,
+                'title': user,
+                'jscriptfn': 'dload_timestat3',
+                })
+        return HttpResponse(loader.get_template("timestat.html").render(c))
+    else:
+        raise Http404()
 
+def hits_location(request, location):
+    if location in regions:
+            c = Context({})
+            hits = Hit.all().filter('where = ', location)
+            #logging.info('where %s' % location)
+            incr = 100
+            dfrom = 0 # data read from
+            table = {}
+            while dfrom < hits.count():
+                for hit in hits.fetch(incr, dfrom):
+                    otime = hit.time.replace(tzinfo=utc).astimezone(erep)
+                    d = date(otime.year, otime.month, otime.day)
+                    if d in table:
+                        table[d] += hit.dmg
+                    else:
+                        table[d] = hit.dmg
+                dfrom += incr
+            c['title'] = location
+            c['table'] = table
+            return HttpResponse(loader.get_template('region.html').render(c))
+    else:
+        raise Http404
+
+def hits_regions(request, page):
+    c = Context({})
+    return HttpResponse(loader.get_template('regions.html').render(c))
+
+def tolower(request, table, fro, to):
+    if table == 'session':
+        s = Session.all()
+        i = int(fro)
+        e = s.count()
+        while i < int(to):
+            ss = s.fetch(100, i)
+            i += 100
+            for a in ss:
+                a.user = a.user.lower()
+                a.put()
+    elif table == 'cuser':
+        s = CUser.all()
+        i = 0
+        e = s.count()
+        while i < s.count():
+            ss = s.fetch(100, i)
+            i += 100
+            for a in ss:
+                a.name = a.name.lower()
+                a.put()
+    elif table == 'hit':
+        s = Hit.all()
+        i = 0
+        e = s.count()
+        while i < s.count():
+            ss = s.fetch(100, i)
+            i += 100
+            for a in ss:
+                a.name = a.name.lower()
+                a.put()
+
+        
+    return HttpResponse("%s from %d %d" % (table, e, i))

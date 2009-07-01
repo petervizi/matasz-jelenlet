@@ -8,15 +8,20 @@ package require http
 package require json
 
 bind pub * "!utottem" pub:utottem
-#bind pub * "!mennyit" pub:mennyit
+bind pub * "!mennyit" pub:mennyit
+set regions { "Cuyo" "Pacifica" "Tyrol" "Victoria" "Northeast Region" "Zona Central" "Northern Territory" "British Columbia" "East Srpska Republic" "Norte Grande" "Henan" "Guizhou" "Varna" "Mesopotamia" "South Australia" "Western Australia" "Hunan" "Pando" "Liaoning" "Vidin" "Alberta" "Amazonica" "Vorarlberg" "Jiangsu" "Hainan" "Upper Austria" "Newfoundland and Labrador" "Saskatchewan" "Hubei" "Zhejiang" "Norte Chico" "Heilongjiang" "Tasmania" "Nunavut" "Xinjiang" "Shaanxi" "Salzburg" "Ruse" "Fujian" "Guangxi" "Ningxia" "North East Chaco" "Southeast Region" "Quebec" "Nova Scotia" "Burgenland" "Guangdong" "New South Wales" "Ontario" "Anhui" "Burgas" "Andina" "Walloon Region" "Inner Mongolia" "Bolivian Altiplano" "Gansu" "Yunnan" "Prince Edward Island" "Queensland" "Jiangxi" "Brussels-Capital Region" "North West Chaco" "North Region" "Argentine Northwest" "New Brunswick" "Beijing" "South Region" "Caribe e Insular" "Cundiboyacense" "Jilin" "Center-West Region" "Slavonia" "Gran Chaco" "Shanghai" "Zona Sur" "Central West Chaco" "Orinoquia" "Tibet" "Carinthia" "Federation of Bosnia and Herze" "Patagonia" "Northwest Territories" "Chongqing" "Flemish Region" "Zona Austral" "Lower Austria" "West Srpska Republic" "Central Croatia" "Styria" "Plovdiv" "Shandong" "Far South" "Pampas" "Sofia" "Qinghai" "Sichuan" "Manitoba" "Yukon" "Shanxi" "Dnipro" "North Caucasus Region"}
 
 proc pub:utottem { nick host hand chan text } {
-    global log_url
+    global log_url regions
     if {[info exists log_url($chan)]} {
 	set text [split $text ","]
 	set where [lindex $text 0]
 	set dmg [lindex $text 1]
 	if {($where != "") && ($dmg != "")} {
+	    if { [lsearch -exact $regions $where] == -1} {
+		puthelp "NOTICE $nick :Ilyen region nincs: $where"
+		return 0
+	    }
 	    set query [http::formatQuery "user" $nick "where" $where "dmg" $dmg]
 	    set token [http::geturl "$log_url($chan)/hit" -query $query]
 	    set code [http::ncode $token]
@@ -70,7 +75,7 @@ proc pub:mennyit { nick host hand chan text } {
 	}
 	set ido [lindex $idohely 0]
 	set hely [lindex $idohely 1]
-	puthelp "NOTICE $nick :ki $ki hol $hely mikor $ido"
+	# puthelp "NOTICE $nick :ki $ki hol $hely mikor $ido"
 	set now [clock seconds]
 	if {$ido == "tegnap"} then {
 	    set dat [expr $now - 86400]

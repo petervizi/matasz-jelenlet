@@ -25,3 +25,7 @@ class Hit(BaseModel):
     time = db.DateTimeProperty()
     where = db.StringProperty()
     dmg = db.IntegerProperty()
+
+class GraphCache(BaseModel):
+    url = db.StringProperty()
+    graph = db.BlobProperty()

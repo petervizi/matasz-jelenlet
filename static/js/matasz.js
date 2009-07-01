@@ -65,6 +65,16 @@ function dload_timestat2(arg1, arg2) {
 			 }
 		    });
 }
+function dload_timestat3(arg1, arg2) {
+    $('dload_timestat3img').src = "/images/parts/spinner_big.gif";
+    new Ajax.Request('/activity/' + arg1 + '/' + arg2,
+		     {
+			 method: 'post',
+			 onSuccess: function(response) {
+			     $('timestat3').update(response.responseText);
+			 }
+		    });
+}
 
 var Duration = Class.create();
 Duration.setup = function(params) {

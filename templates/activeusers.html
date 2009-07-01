@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+<ul>
+{% for key, value in sorted %}
+<li><a href="/user/{{ key }}">{{ key }}</a>: {{ value }}</li>
+{% endfor %}
+</ul>
+{% endblock %}
