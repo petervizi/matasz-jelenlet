@@ -259,6 +259,10 @@ def week(request, year, month, day):
         G = pickle.loads(cache.get())
     else:
         G = week_graph(int(year), int(month), int(day))
+        cache = GraphCache()
+        cache.url = request.path
+        cache.graph = pickle.loads(G)
+        cache.put()
     return HttpResponseRedirect(G.url)
 
 def timestat(request, duration, user, fyear, fmonth, fday):
