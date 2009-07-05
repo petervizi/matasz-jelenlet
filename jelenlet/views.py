@@ -160,8 +160,9 @@ def login(request):
 def logout(request):
     if request.method == 'POST':
         #logging.info('logout')
+        user = request.POST.get('user', '').lower()
         session_q = Session.all()
-        session_q.filter('user = ', request.POST['user'].lower())
+        session_q.filter('user = ', user)
         session_q.order('-login')
         session = session_q.get()
         #logging.info('User %s' % session.user)
@@ -182,11 +183,11 @@ def logout(request):
             session.user = request.POST['user'].lower()
             session.logout = session.login
         session.put()
-        duser = CUser.all().filter('name = ', request.POST['user'].lower()).get()
+        duser = CUser.all().filter('name = ', user).get()
         if not duser:
             #logging.info('creating new user')
             duser = CUser()
-            duser.name = request.POST['user'].lower()
+            duser.name = user
             duser.lastlogin = datetime.now()
             duser.online_time = 0
             duser.online = True
@@ -199,6 +200,8 @@ def logout(request):
             except:
                 #logging.info('could not decrease number')
                 userno.number = 0
+        else:
+            userno.number = n
         duser.online = False
         #logging.info("New UserNumber %d" % userno.number)
         userno.put()            
