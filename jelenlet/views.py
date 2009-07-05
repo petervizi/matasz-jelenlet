@@ -344,24 +344,24 @@ def hits(request, page):
         format = 'html'
     else:
         t = loader.get_template("ajaxhits.html")
-        name = request.POST.get('name', '')
+        name = request.POST.get('name', '').lower()
         page = request.POST.get('page', 0)
         time = request.POST.get('time', '')
         if time:
             time = getdatefromstring(time)
-        where = request.POST.get('where', '')
+        where = request.POST.get('where', '').lower()
         format = request.POST.get('format', 'html')
-        #logging.info("format %s" % format)
+        logging.info("format %s" % format)
         # Here comes the bot's request
         hits = Hit.all()
         if name:
             hits.filter('name = ', name)
-            #logging.info("name %s", name)
+            logging.info("name %s", name)
         if where:
             hits.filter('where = ', where)
-            #logging.info("where %s", where)
+            logging.info("where %s", where)
         if time:
-            #logging.info("time %s" % time)
+            logging.info("time %s" % time)
             max = time + timedelta(days = 1)
             hits.filter("time > ", time)
             hits.filter("time < ", max)
@@ -422,6 +422,30 @@ def hits(request, page):
             return HttpResponse(data, mimetype="text/json")
         except Exception, e:
             return HttpResponse("itt a bibi %s" % e)
+    elif format == 'txt':
+        sum = 0
+        data = {}
+        if len(hits) > 0:
+            for hit in hits:
+                hit.where = hit.where.capitalize()
+                sum += hit.dmg
+                if hit.where in data:
+                    if hit.time.strftime("%Y-%m-%d") in data[hit.where]:
+                        data[hit.where][hit.time.strftime("%Y-%m-%d")] += hit.dmg
+                    else:
+                        data[hit.where][hit.time.strftime("%Y-%m-%d")] = hit.dmg
+                else:
+                    data[hit.where] = {}
+                    data[hit.where][hit.time.strftime("%Y-%m-%d")] = hit.dmg            
+            ret = []
+            for where in data:
+                for time in data[where]:
+                    ret.append("%s %s: %d" % (where, time, data[where][time]))
+            ret.append("%s: %d" % (_("Sum"), sum))
+            ret = "\n".join(ret)
+        else:
+            ret = _("No result.")
+        return HttpResponse(ret, mimetype="text/plain")
     else:
         pass
 

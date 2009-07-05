@@ -2,6 +2,7 @@
 # Requires json (tcllib) and dict (http://pascal.scheffers.net/software/tclDict-8.5.2.tar.gz)
 
 set log_url(#hunyadi) "http://hunyadiszazad.appspot.com"
+set log_url(#nomnom) "http://hunyadiszazad.appspot.com"
 #set log_url(#nomnom) "http://localhost:8080"
 
 package require http
@@ -9,7 +10,7 @@ package require json
 
 bind pub * "!utottem" pub:utottem
 bind pub * "!mennyit" pub:mennyit
-set regions { "Cuyo" "Pacifica" "Tyrol" "Victoria" "Northeast Region" "Zona Central" "Northern Territory" "British Columbia" "East Srpska Republic" "Norte Grande" "Henan" "Guizhou" "Varna" "Mesopotamia" "South Australia" "Western Australia" "Hunan" "Pando" "Liaoning" "Vidin" "Alberta" "Amazonica" "Vorarlberg" "Jiangsu" "Hainan" "Upper Austria" "Newfoundland and Labrador" "Saskatchewan" "Hubei" "Zhejiang" "Norte Chico" "Heilongjiang" "Tasmania" "Nunavut" "Xinjiang" "Shaanxi" "Salzburg" "Ruse" "Fujian" "Guangxi" "Ningxia" "North East Chaco" "Southeast Region" "Quebec" "Nova Scotia" "Burgenland" "Guangdong" "New South Wales" "Ontario" "Anhui" "Burgas" "Andina" "Walloon Region" "Inner Mongolia" "Bolivian Altiplano" "Gansu" "Yunnan" "Prince Edward Island" "Queensland" "Jiangxi" "Brussels-Capital Region" "North West Chaco" "North Region" "Argentine Northwest" "New Brunswick" "Beijing" "South Region" "Caribe e Insular" "Cundiboyacense" "Jilin" "Center-West Region" "Slavonia" "Gran Chaco" "Shanghai" "Zona Sur" "Central West Chaco" "Orinoquia" "Tibet" "Carinthia" "Federation of Bosnia and Herze" "Patagonia" "Northwest Territories" "Chongqing" "Flemish Region" "Zona Austral" "Lower Austria" "West Srpska Republic" "Central Croatia" "Styria" "Plovdiv" "Shandong" "Far South" "Pampas" "Sofia" "Qinghai" "Sichuan" "Manitoba" "Yukon" "Shanxi" "Dnipro" "North Caucasus Region"}
+set regions { "Cuyo" "Pacifica" "Tyrol" "Victoria" "Northeast Region" "Zona Central" "Northern Territory" "British Columbia" "East Srpska Republic" "Norte Grande" "Henan" "Guizhou" "Varna" "Mesopotamia" "South Australia" "Western Australia" "Hunan" "Pando" "Liaoning" "Vidin" "Alberta" "Amazonica" "Vorarlberg" "Jiangsu" "Hainan" "Upper Austria" "Newfoundland and Labrador" "Saskatchewan" "Hubei" "Zhejiang" "Norte Chico" "Heilongjiang" "Tasmania" "Nunavut" "Xinjiang" "Shaanxi" "Salzburg" "Ruse" "Fujian" "Guangxi" "Ningxia" "North East Chaco" "Southeast Region" "Quebec" "Nova Scotia" "Burgenland" "Guangdong" "New South Wales" "Ontario" "Anhui" "Burgas" "Andina" "Walloon Region" "Inner Mongolia" "Bolivian Altiplano" "Gansu" "Yunnan" "Prince Edward Island" "Queensland" "Jiangxi" "Brussels-Capital Region" "North West Chaco" "North Region" "Argentine Northwest" "New Brunswick" "Beijing" "South Region" "Caribe e Insular" "Cundiboyacense" "Jilin" "Center-West Region" "Slavonia" "Gran Chaco" "Shanghai" "Zona Sur" "Central West Chaco" "Orinoquia" "Tibet" "Carinthia" "Federation of Bosnia and Herze" "Patagonia" "Northwest Territories" "Chongqing" "Flemish Region" "Zona Austral" "Lower Austria" "West Srpska Republic" "Central Croatia" "Styria" "Plovdiv" "Shandong" "Far South" "Pampas" "Sofia" "Qinghai" "Sichuan" "Manitoba" "Yukon" "Shanxi" "Dnipro" "North Caucasus Region" "West Serbia" "East Serbia" "Belgrade" "Limpopo"}
 
 proc pub:utottem { nick host hand chan text } {
     global log_url regions
@@ -62,6 +63,7 @@ proc get_time_and_place {a b} {
 
 proc pub:mennyit { nick host hand chan text } {
     global log_url
+    putlog $text
     if [regexp -nocase {(utottunk|utottem|utott)[ ]{0,1}([A-Za-z]*) ([a-zA-Z]+(?:ban|ben|ba|be|en)|tegnap|ma|[1-9]+)[ ]{0,1}(([a-zA-Z]+)(ban|ben|ba|be|en)|tegnap|ma|[1-9]+){0,1}\?} $text matchresult group1 group2 group3 group4] then {
 	if {$group1 == "utott"} then {
 	    set ki $group2
@@ -75,7 +77,6 @@ proc pub:mennyit { nick host hand chan text } {
 	}
 	set ido [lindex $idohely 0]
 	set hely [lindex $idohely 1]
-	# puthelp "NOTICE $nick :ki $ki hol $hely mikor $ido"
 	set now [clock seconds]
 	if {$ido == "tegnap"} then {
 	    set dat [expr $now - 86400]
@@ -86,28 +87,24 @@ proc pub:mennyit { nick host hand chan text } {
 	if {$ki == "en"} {
 	    set ki $nick
 	}
-	set query [http::formatQuery "name" $ki "where" $hely "time" $ido "format" "json"]
+	set query [http::formatQuery "name" $ki "where" $hely "time" $ido "format" "txt"]
 	set token [http::geturl "$log_url($chan)/hits/" -query $query]
-	set result [http::data $token]
-	set result [json::json2dict $result]
-	set err [dict get $result err]
-	if {!$err} then {
-	    set sum [dict get $result sum]
-	    set data [dict get $result data]
+	set code [http::ncode $token]
+	if {$code == 200} {
+	    set result [http::data $token]
+	    set result [split $result "\n"]
 	    if {$ki == ""} {
 		set ki "Az egyseg"
 	    }
 	    puthelp "NOTICE $chan :$nick: $ki utese"
-	    dict for {where when} $data {
-		dict for {when dmg} $when {
-		    puthelp "NOTICE $chan :$nick: $where $when $dmg"
-		}
+	    foreach line $result {
+		puthelp "NOTICE $chan :$nick: $line"
 	    }
-	    puthelp "NOTICE $chan :$nick: Osszesen $sum"
+	} else {
+	    puthelp "NOTICE $nick :A szerver nem erheto el ($code)"
 	}
     } else {
 	puthelp "NOTICE $nick :Nem ertem mit mondol!"
-	# puts "my regex could not match the subject string"
     }
     return 0
 }
