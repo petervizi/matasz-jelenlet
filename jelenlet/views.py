@@ -321,7 +321,7 @@ def hit(request):
         raise Http404
 
 DATEREG = re.compile("(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})")
-def getdatefromstring(string):
+def getdatefromstring(string, zone=None):
     '''Return a datetime from a string: 2009-01-01'''
     m = DATEREG.match(string)
     if m:
@@ -331,6 +331,8 @@ def getdatefromstring(string):
         dd = datetime(year, month, day)
     else:
         dd = datetime.today()
+    if zone:
+        dd = dd.replace(tzinfo=zone).astimezone(utc)
     return dd
 
 
@@ -351,7 +353,7 @@ def hits(request, page):
         page = request.POST.get('page', 0)
         time = request.POST.get('time', '')
         if time:
-            time = getdatefromstring(time)
+            time = getdatefromstring(time, erep)
         where = request.POST.get('where', '').lower()
         format = request.POST.get('format', 'html')
         logging.info("format %s" % format)
