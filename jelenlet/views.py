@@ -385,9 +385,9 @@ def hits(request, page):
         next = page + 1
     prange = xrange(page - 3, page + 4)
     prange = [p for p in prange if p > 0 and p <= pcount]
-    hits = hits.fetch(hits_per_page, (page-1)*hits_per_page)
     #logging.info("len(hits) %d" % len(hits))
     if format == 'html':
+        hits = hits.fetch(hits_per_page, (page-1)*hits_per_page)
         for hit in hits:
             hit.time = hit.time.replace(tzinfo=utc).astimezone(cest)
         c = Context({
@@ -402,6 +402,7 @@ def hits(request, page):
                 })
         return HttpResponse(t.render(c))
     elif format == 'json':
+        hits = hits.fetch(hits.count())
         sum = 0
         data = {}
         for hit in hits:
@@ -426,6 +427,7 @@ def hits(request, page):
         except Exception, e:
             return HttpResponse("itt a bibi %s" % e)
     elif format == 'txt':
+        hits = hits.fetch(hits.count())
         sum = 0
         data = {}
         if len(hits) > 0:
