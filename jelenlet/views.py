@@ -174,8 +174,7 @@ def logout(request):
             #logging.info('UserNumber was %d' % n.number)
             n = n.number
         if session: # XXX wtf?
-            pass
-            #session.logout = datetime.now()
+            session.logout = datetime.now()
             #logging.info('there was a session, closing')
         else:
             loggin.debug('creating new session')
@@ -256,12 +255,12 @@ def create_weekly_graph(query):
 def week(request, year, month, day):
     cache = GraphCache.all().filter('url = ', request.path)
     if cache.count() == 1:
-        G = pickle.loads(cache.get())
+        G = pickle.loads(cache.get().graph)
     else:
         G = week_graph(int(year), int(month), int(day))
         cache = GraphCache()
         cache.url = request.path
-        cache.graph = pickle.loads(G)
+        cache.graph = pickle.dumps(G)
         cache.put()
     return HttpResponseRedirect(G.url)
 
@@ -547,9 +546,9 @@ def hits_regions(request, page):
     return HttpResponse(loader.get_template('regions.html').render(c))
 
 def tolower(request, table, fro, to):
+    i = int(fro)
     if table == 'session':
         s = Session.all()
-        i = int(fro)
         e = s.count()
         while i < int(to):
             ss = s.fetch(100, i)
@@ -559,9 +558,8 @@ def tolower(request, table, fro, to):
                 a.put()
     elif table == 'cuser':
         s = CUser.all()
-        i = 0
         e = s.count()
-        while i < s.count():
+        while i < int(to):
             ss = s.fetch(100, i)
             i += 100
             for a in ss:
@@ -569,9 +567,8 @@ def tolower(request, table, fro, to):
                 a.put()
     elif table == 'hit':
         s = Hit.all()
-        i = 0
         e = s.count()
-        while i < s.count():
+        while i < int(to):
             ss = s.fetch(100, i)
             i += 100
             for a in ss:

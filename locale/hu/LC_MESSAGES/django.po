@@ -42,7 +42,7 @@ msgstr "Bejelentkezések a múlt héten"
 #: templates/404.html:6 templates/500.html:6 templates/base.html:5
 #: templates/base.html.py:48
 msgid "MATASZ Presence"
-msgstr "Hunyadi Század"
+msgstr "MATASZ Jelenlét"
 
 #: templates/ajaxhits.html:20 templates/ajaxlist.html:25
 #: templates/hits.html:26 templates/list.html:31
@@ -96,7 +96,7 @@ msgstr ""
 
 #: templates/base.html:79
 msgid "MATASZ"
-msgstr "Hunyadi Század"
+msgstr "MATASZ"
 
 #: templates/base.html:84
 msgid "Number of users relative to peak"
