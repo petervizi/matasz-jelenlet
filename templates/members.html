@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load exprtag %}
+
+{% block content %}
+<table width="690" border="0" align="left" cellpadding="0" cellspacing="0" class="offers">
+    <tr>
+      <th width="65">{% trans "Avatar" %}</th>
+      <th width="89">{% trans "Name" %}</th>
+      <th width="50">{% trans "Sex" %}</th>
+      <th width="89">{% trans "Level" %}</th>
+      <th width="89">{% trans "Strength" %}</th>
+      <th width="89">{% trans "Rank" %}</th>
+      <th width="89">{% trans "Damage" %}</th>
+      <th width="89">{% trans "Region" %}</th>
+    </tr>
+    {% for member in members %}
+    <tr>
+      <td><a href="http://www.erepublik.com/en/citizen/profile/{{ member.id }}">
+	  <img src="http://static.erepublik.com/uploads/avatars/Citizens/{{ member.avatar }}_55x55.jpg" /></a></td>
+      <td><a href="/user/{{ member.name }}">{{ member.name|title }}</a></td>
+      <td>
+	<div class="sex{{ member.sex }}"> <!-- -150 -143 -->
+	  <div class="sex{{ member.sex }}wm" style="height: {{ member.wellness }}%;">
+	  </div><!-- -10 -153 -->
+	</div>
+      </td>
+      <td>{{ member.level }}</td>
+      <td>{{ member.strength }}</td>
+      <td>{{ member.rank }}</td>
+      <td>{{ member.damage }}</td>
+      <td><a href="/region/{{ member.region }}">{{ member.region|title }}</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% expr members_per_page > 10 as what %}
+{% if what %}
+    <a href="javascript:decrease_page('members_per_page');location.reload(true);"><img src="/images/parts/pager_arrow-small-up_active.gif" alt="more sessions" /></a>
+{% else %}
+    <img src="/images/parts/pager_arrow-small-up_inactive.gif" alt="more sessions" />
+{% endif %}
+{% expr members_per_page < 90 as what %}
+{% if what %}
+    <a href="javascript:increase_page('members_per_page');location.reload(true);"><img src="/images/parts/pager_arrow-small-down_active.gif" alt="more sessions" /></a>
+{% else %}
+      <img src="/images/parts/pager_arrow-small-down_inactive.gif" alt="more sessions" />
+{% endif %}
+
+<ul class="pager">
+    {% expr prev >= 0 as is_prev %}
+    {% if is_prev %}
+    <li><a href="/members"" class="first" /></li>
+    <li><a href="/members/{{ prev }}" class="prev">{% trans "Prev" %}</a></li>
+    {% endif %}
+    {% for p in prange %}
+    <li><a href="/members/{{ p }}" {% ifequal p page %}class="on"{% endifequal %}>{{ p }}</a></li>
+    {% endfor %}
+    {% if next %}
+    <li><a href="/members/{{ next }}" class="next">{% trans "Next" %}</a></li>
+    <li><a href="/members/{{ last }}" class="last" /></li>
+    {% endif %}
+</ul>
+{% endblock %}
