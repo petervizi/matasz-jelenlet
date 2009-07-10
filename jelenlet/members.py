@@ -72,9 +72,13 @@ def members(request, page):
 conn = httplib.HTTPConnection("api.erepublik.com")
 
 def member_add(request):
+    logging.info("method: %s" % request.method)
     if request.method == 'POST':
         name = request.POST.get('name', '').lower()
-        id = int(request.POST.get('id', 0))
+        try:
+            id = int(request.POST.get('id', 0))
+        except:
+            id = 0
         logging.info("name %s id %d" % (name, id))
         # check if already in db
         member = Member.all().filter('name = ', name).get()
@@ -84,6 +88,7 @@ def member_add(request):
             s_url = "/v1/feeds/citizens/%d" % id
         else:
             s_url = "/v1/feeds/citizens/%s?by_username=true" % name
+        logging.info("s_url %s" % s_url)
 #        if not conn:
 #            logging.info("new connection")
 #            conn = httplib.HTTPConnection("api.erepublik.com")
@@ -92,13 +97,10 @@ def member_add(request):
         if r1.status == 200:
             member = Member()
             member.name = name
-            if id:
-                member.id = id
-            else:
-                doc = xml.dom.minidom.parse(r1)
-                id = doc.getElementsByTagName('id')
-                id = int(id[len(id)-1].firstChild.data)
-                member.id = id
+            doc = xml.dom.minidom.parse(r1)
+            id = doc.getElementsByTagName('id')
+            id = int(id[len(id)-1].firstChild.data)
+            member.id = id
             db = doc.getElementsByTagName('date-of-birth')[0].firstChild.data
             db = datetime.strptime(db, "%Y-%m-%d %H:%M:%S %Z")
             member.avatar = "%s/%s" % (db.strftime("%Y/%m/%d"),
