@@ -28,6 +28,8 @@
     <script type="text/javascript" src="/js/matasz.js" defer="defer"></script>
     <script type="text/javascript">
         // google.load("prottoype", "1.6.0.3");
+    {% block javascript %}
+    {% endblock %}
     </script>
     {% block script %}
     {% endblock %}
@@ -54,8 +56,12 @@
 		<!-- <li><a href="/regions">{% trans "Hits by location" %}</a></li> -->
 	      </ul>
 	    </li>
-	    <li id="menu4"><a href="/"></a></li>
-	    <li id="menu5"><a href="/"></a></li>
+	    <li id="menu4"><a href="#"><div>{% trans "Members" %}</div></a>
+              <ul>
+                <li><a href="/members">{% trans "List of members" %}</a></li>
+              </ul>
+            </li>
+	    <li id="menu5"><a href="#"></a></li>
 	  </ul>
 	</div> <!-- menu -->
 	

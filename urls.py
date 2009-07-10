@@ -31,7 +31,10 @@ urlpatterns = patterns('',
                        (r'^region/(?P<location>.+)', 'jelenlet.views.hits_location'),
                        (r'^regions/(?P<page>\d*)', 'jelenlet.views.hits_regions'),
                        (r'^hits/(?P<page>\d*)', 'jelenlet.views.hits'),
-                       (r'^tolower/(?P<table>\w+)/(?P<fro>\d*)/(?P<to>\d*)', 'jelenlet.views.tolower'),
+                       (r'^members/(?P<page>\d*)', 'jelenlet.members.members'),
+                       (r'^member/add/', 'jelenlet.members.member_add'),
+                       (r'^member/remove/', 'jelenlet.members.member_remove'),
+#                       (r'^tolower/(?P<table>\w+)/(?P<fro>\d*)/(?P<to>\d*)', 'jelenlet.views.tolower'),
     # Example:
     # (r'^foo/', include('foo.urls')),
 

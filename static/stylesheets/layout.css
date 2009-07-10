@@ -392,6 +392,13 @@ width: 254px;
 				background-image: url(/images/parts/map-erepublik-logged.png);
 				background-position: -572px -369px;
 			}
+			#menu ul li#menu4 a div {
+                                color: white;
+                                font-weight: bold;
+                                position: relative;
+                                top: 10px;
+                                left: 10px;
+			}
 			#menu ul li#menu5 a {
 				background-image: url(/images/parts/map-erepublik-logged.png);
 				background-position: -763px -369px;
@@ -6199,4 +6206,27 @@ font-family: Helvetica,Arial,sans-serif;
   padding: 0px 0px 0px 0px;
   border:1px solid #d9d9d9;
   color: #868686;
+}
+
+div.sexf { 
+  display: block;
+  height: 50px;
+  width: 50px;
+  background: url(/images/parts/map-erepublik-logged.png) no-repeat -79px -153px;
+}
+div.sexm { 
+  display:block;
+  height: 50px;
+  width: 50px;
+  background: url(/images/parts/map-erepublik-logged.png) no-repeat -10px -153px;
+}
+div.sexmwm { 
+  display:block;
+  width: 50px;
+  background: url(/images/parts/map-erepublik-logged.png) no-repeat -150px -143px;
+}
+div.sexfwm { 
+  display: block;
+  width: 50px;
+  background: url(/images/parts/map-erepublik-logged.png) no-repeat -219px -143px;
 }

@@ -29,3 +29,8 @@ class Hit(BaseModel):
 class GraphCache(BaseModel):
     url = db.StringProperty()
     graph = db.BlobProperty()
+
+class Member(BaseModel):
+    name = db.StringProperty()
+    id = db.IntegerProperty()
+    avatar = db.StringProperty()
