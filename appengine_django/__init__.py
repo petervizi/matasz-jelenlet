@@ -112,6 +112,13 @@ except ImportError, e:
   sys.path = sys.path[0:1] + EXTRA_PATHS + sys.path[1:]
   from google.appengine.api import apiproxy_stub_map
 
+# Try to import Django 1.0 through App Engine
+try:
+  from google.appengine.dist import use_library
+  use_library('django', '1.0')
+except ImportError:
+  pass
+
 # Look for a zipped copy of Django.
 have_django_zip = False
 django_zip_path = os.path.join(PARENT_DIR, 'django.zip')
@@ -452,6 +459,11 @@ def InstallAppengineHelperForDjango():
   If the variable DEBUG_APPENGINE_DJANGO is set in the environment verbose
   logging of the actions taken will be enabled.
   """
+  # Adding this again here to solve a problem that happens when context
+  # switching from webapp.template to django.template.
+  # TODO(elsigh): Maybe there is a deeper, fixable problem somewhere?
+  os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+
   if VERSION < (1, 0, None):
     logging.error("Django 1.0 or greater is required!")
     sys.exit(1)
