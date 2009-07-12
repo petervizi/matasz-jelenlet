@@ -26,6 +26,8 @@ import logging
 
 from operator import itemgetter
 
+from members import *
+
 def get_online_users():
     data = memcache.get('online_users')
     if data is None:
@@ -159,7 +161,6 @@ def login(request):
 
 def logout(request):
     if request.method == 'POST':
-        #logging.info('logout')
         user = request.POST.get('user', '').lower()
         session_q = Session.all()
         session_q.filter('user = ', user)
@@ -178,7 +179,6 @@ def logout(request):
             session.logout = datetime.now()
             #logging.info('there was a session, closing')
         else:
-            loggin.debug('creating new session')
             session = Session()
             session.user = request.POST['user'].lower()
             session.logout = session.login

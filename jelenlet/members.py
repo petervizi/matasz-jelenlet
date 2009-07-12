@@ -114,7 +114,7 @@ def member_add(request):
 
 def member_remove(request):
     if request.method == 'POST':
-        name = request.POST.get('name', '')
+        name = request.POST.get('name', '').lower()
         member = Member.all().filter('name = ', name).get()
         if member:
             member.delete()
