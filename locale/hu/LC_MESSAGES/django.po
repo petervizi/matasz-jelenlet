@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-07-10 15:25+0000\n"
-"PO-Revision-Date: 2009-07-10 17:30+0200\n"
+"PO-Revision-Date: 2009-07-12 16:44+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -34,17 +34,17 @@ msgstr "Tagok"
 #: jelenlet/members.py:82
 #, python-format
 msgid "%(name)s is already member."
-msgstr "%(name)s már tag."
+msgstr "%(name)s mar tag."
 
 #: jelenlet/members.py:107
 #, python-format
 msgid "New member %(name)s %(url)s"
-msgstr "Új tag %(name)s %(url)s"
+msgstr "Uj tag %(name)s %(url)s"
 
 #: jelenlet/members.py:110
 #, python-format
 msgid "Citizen %(name)s not found."
-msgstr "Nincs ilyen név %(name)s"
+msgstr "Nincs ilyen nev %(name)s"
 
 #: jelenlet/members.py:119
 #, python-format
